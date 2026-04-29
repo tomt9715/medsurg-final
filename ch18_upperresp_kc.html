@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch 18 Upper Respiratory — Knowledge Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a2540; --navy-soft: #1a3a5c;
+  --teal: #0d9488; --teal-pale: #f0fdfa;
+  --purple: #7c3aed; --purple-pale: #f5f3ff;
+  --gold: #f59e0b; --ink: #1a1a1a; --ink-soft: #3a3a3a; --muted: #6b7280;
+  --bg: #fafaf7; --card: #ffffff; --line: #e5e0d5;
+  --correct: #059669; --correct-bg: #ecfdf5;
+  --wrong: #dc2626; --wrong-bg: #fef2f2;
+  --partial: #d97706; --partial-bg: #fffbeb;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; padding: 32px 16px 80px; min-height: 100vh; }
+.container { max-width: 760px; margin: 0 auto; }
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--teal); text-transform: uppercase; margin-bottom: 12px; }
+h1 { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--navy); margin-bottom: 8px; line-height: 1.15; }
+.tagline { color: var(--muted); margin-bottom: 32px; font-size: 16px; }
+.start-card, .question-card, .results-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 32px; margin-bottom: 24px; }
+.start-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+.start-stat { border: 1px solid var(--line); border-radius: 4px; padding: 16px; text-align: center; }
+.start-stat-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--teal); display: block; }
+.start-stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+.btn { background: var(--teal); color: white; border: none; padding: 14px 32px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.btn:hover { background: #0b7a70; }
+.btn:disabled { background: var(--muted); cursor: not-allowed; }
+.btn-secondary { background: var(--navy); }
+.btn-secondary:hover { background: var(--navy-soft); }
+.progress-bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 24px; }
+.progress-fill { height: 100%; background: var(--teal); transition: width 0.3s; }
+.q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+.q-stem { font-size: 18px; color: var(--ink); margin-bottom: 24px; line-height: 1.5; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.option { border: 1.5px solid var(--line); border-radius: 6px; padding: 14px 18px; cursor: pointer; transition: all 0.15s; background: var(--card); font-size: 15px; display: flex; align-items: flex-start; gap: 12px; }
+.option:hover:not(.locked) { border-color: var(--teal); background: var(--teal-pale); }
+.option.selected { border-color: var(--teal); background: var(--teal-pale); }
+.option.correct { border-color: var(--correct); background: var(--correct-bg); }
+.option.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+.option-letter { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--muted); min-width: 18px; }
+.option.correct .option-letter { color: var(--correct); }
+.option.wrong .option-letter { color: var(--wrong); }
+.rationale { background: var(--teal-pale); border-left: 3px solid var(--teal); padding: 16px 20px; border-radius: 0 6px 6px 0; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+.rationale strong { color: var(--navy); }
+.concept-pill { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.5px; background: var(--teal); color: white; padding: 3px 10px; border-radius: 100px; margin-bottom: 10px; text-transform: uppercase; }
+.others-list { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--ink-soft); }
+.others-list div { margin-bottom: 6px; }
+.btn-row { display: flex; gap: 12px; justify-content: flex-end; }
+.results-score { font-family: 'DM Serif Display', serif; font-size: 56px; text-align: center; margin: 12px 0; }
+.results-score.pass { color: var(--correct); }
+.results-score.borderline { color: var(--partial); }
+.results-score.fail { color: var(--wrong); }
+.results-pts { font-family: 'DM Mono', monospace; text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.perf-msg { text-align: center; margin: 16px 0 32px; font-size: 16px; color: var(--ink-soft); font-style: italic; }
+.missed-section h3 { font-family: 'DM Serif Display', serif; color: var(--navy); margin-bottom: 16px; font-size: 22px; }
+.missed-item { border: 1px solid var(--line); border-radius: 6px; padding: 16px; margin-bottom: 12px; background: var(--bg); font-size: 14px; }
+.missed-item .stem { font-weight: 500; margin-bottom: 8px; }
+.missed-item .ans { color: var(--correct); margin-bottom: 8px; font-family: 'DM Mono', monospace; font-size: 13px; }
+.missed-item .rat { color: var(--ink-soft); font-size: 13px; }
+.back-btn { position: fixed; bottom: 20px; left: 20px; background: var(--navy); color: white; text-decoration: none; padding: 10px 18px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 50; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-btn">← STUDY HUB</a>
+<div class="container">
+
+<div id="start-screen">
+  <div class="eyebrow">Knowledge Check · Chapter 18</div>
+  <h1>Upper Respiratory Disorders</h1>
+  <p class="tagline">Direct recall: acute vs chronic bronchitis — etiology, duration, signs, patient appearance, mucus features.</p>
+  <div class="start-card">
+    <div class="start-stats">
+      <div class="start-stat"><span class="start-stat-num">15</span><span class="start-stat-label">Questions</span></div>
+      <div class="start-stat"><span class="start-stat-num">MC</span><span class="start-stat-label">Format</span></div>
+      <div class="start-stat"><span class="start-stat-num">Yes</span><span class="start-stat-label">Rationale</span></div>
+    </div>
+    <p style="margin-bottom: 20px; color: var(--ink-soft);">Each question is direct recall from your review guides. Answer, get instant rationale, move on.</p>
+    <button class="btn" onclick="begin()">Begin</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="hidden">
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="question-card">
+    <div class="q-header">
+      <span id="q-counter">Question 1 of 15</span>
+      <span id="q-points">0 pts</span>
+    </div>
+    <div class="q-stem" id="q-stem"></div>
+    <div class="options" id="q-options"></div>
+    <div id="rationale-area" class="hidden"></div>
+    <div class="btn-row">
+      <button class="btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+      <button class="btn btn-secondary hidden" id="next-btn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div id="results-screen" class="hidden">
+  <div class="results-card">
+    <div class="eyebrow">Results · Knowledge Check</div>
+    <h1>Upper Respiratory</h1>
+    <div class="results-score" id="r-score">0%</div>
+    <div class="results-pts" id="r-pts">0 / 15 points</div>
+    <div class="perf-msg" id="r-msg"></div>
+    <div class="btn-row" style="justify-content: center; margin-bottom: 32px;">
+      <button class="btn" onclick="location.reload()">Retry Quiz</button>
+      <a href="index.html" class="btn btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center;">Back to Hub</a>
+    </div>
+    <div class="missed-section" id="missed-section"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'How long does acute bronchitis typically last?',
+    options: [
+      '1-2 days',
+      '1-2 months',
+      '6 months or longer',
+      '1-2 weeks'
+    ],
+    answer: 3,
+    concept: 'Acute Duration',
+    rationale: 'Acute bronchitis is sudden onset lasting 1-2 weeks following an infection.',
+    others: {
+      0: '1-2 days is too short — symptoms last weeks.',
+      1: 'Months would suggest chronic, not acute.',
+      2: '6 months meets the chronic bronchitis time frame.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'What is the most common cause of acute bronchitis?',
+    options: [
+      'Long-term tobacco use',
+      'A viral infection',
+      'Genetic mutation',
+      'Autoimmune airway disorder'
+    ],
+    answer: 1,
+    concept: 'Acute Etiology',
+    rationale: 'Acute bronchitis is usually caused by a viral infection. Bacterial and mycoplasma causes also occur.',
+    others: {
+      0: 'Tobacco causes chronic bronchitis (80-90% of cases).',
+      2: 'Genetic mutation does not cause acute bronchitis.',
+      3: 'Autoimmune disorders are not the cause.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'Which signs and symptoms are classic for acute bronchitis?',
+    options: [
+      'Fever, chills, and sudden cough',
+      'Chronic productive cough for 3+ months',
+      'Cyanosis and lower extremity edema',
+      'Barrel chest and pursed-lip breathing'
+    ],
+    answer: 0,
+    concept: 'Acute S/S',
+    rationale: 'Acute bronchitis presents with fever, chills, malaise, scratchy throat, and sudden cough.',
+    others: {
+      1: 'That meets chronic bronchitis criteria.',
+      2: 'Cyanosis and edema are chronic bronchitis findings.',
+      3: 'Barrel chest and pursed-lip breathing are emphysema findings.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'Which criteria are required to diagnose chronic bronchitis?',
+    options: [
+      'Sudden cough lasting 1-2 weeks following a viral infection',
+      'Wheezing during exercise twice per year for 3 consecutive years',
+      'Productive cough ≥3 months in 2 consecutive years',
+      'Fever and sore throat for at least 1 month with malaise'
+    ],
+    answer: 2,
+    concept: 'Chronic Diagnosis',
+    rationale: 'Chronic bronchitis requires a productive cough for at least 3 months in 2 consecutive years.',
+    others: {
+      0: 'Sudden cough 1-2 weeks describes ACUTE bronchitis.',
+      1: 'Wheezing on exertion describes asthma.',
+      3: 'Fever and sore throat are acute infection findings.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'What characterizes chronic bronchitis?',
+    options: [
+      'Brief inflammation following a viral upper respiratory infection',
+      'Allergic airway hyperresponsiveness with wheezing',
+      'Bronchi inflammation with excessive mucus production',
+      'Destruction of alveolar walls and loss of elastic recoil'
+    ],
+    answer: 2,
+    concept: 'Chronic Patho',
+    rationale: 'Chronic bronchitis is a disease of the airways (bronchi) characterized by inflammation and too much mucus.',
+    others: {
+      0: 'Brief post-viral inflammation describes acute bronchitis.',
+      1: 'Allergic airway hyperresponsiveness describes asthma.',
+      3: 'Alveolar wall destruction describes emphysema.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'Which patient appearance is most associated with chronic bronchitis?',
+    options: [
+      'Cyanotic and obese',
+      'Thin, barrel-chested appearance',
+      'Pale and underweight',
+      'Tan and muscular'
+    ],
+    answer: 0,
+    concept: 'Blue Bloater',
+    rationale: 'Chronic bronchitis patients are typically cyanotic and obese — known as the "blue bloater" appearance.',
+    others: {
+      1: 'Thin and barrel-chested describes the emphysema "pink puffer".',
+      2: 'Pale and underweight is not the typical chronic bronchitis appearance.',
+      3: 'Tan and muscular has no clinical association with this disorder.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'What is the primary etiology of chronic bronchitis?',
+    options: [
+      'Viral upper respiratory infections',
+      'Tobacco smoke (80-90% of cases)',
+      'Allergens such as dust mites and pollen',
+      'Genetic predisposition only'
+    ],
+    answer: 1,
+    concept: 'Chronic Etiology',
+    rationale: 'Tobacco smoke causes 80-90% of chronic bronchitis cases. Pollutants and aging also contribute.',
+    others: {
+      0: 'Viral infections cause ACUTE bronchitis.',
+      2: 'Allergens trigger asthma, not chronic bronchitis.',
+      3: 'Chronic bronchitis is environmentally driven, not purely genetic.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient with chronic bronchitis has thick, constant mucus that blocks airflow. What is this finding called?',
+    options: [
+      'Mucus overload',
+      'Airway hyperresponsiveness',
+      'Alveolar collapse',
+      'Pulmonary fibrosis'
+    ],
+    answer: 0,
+    concept: 'Mucus Overload',
+    rationale: 'Mucus overload describes the constant, thick mucus production in chronic bronchitis that blocks airflow.',
+    others: {
+      1: 'Airway hyperresponsiveness describes asthma.',
+      2: 'Alveolar collapse describes atelectasis.',
+      3: 'Pulmonary fibrosis is scarring of lung tissue, not mucus blockage.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'Which findings differentiate acute bronchitis from chronic bronchitis?',
+    options: [
+      'Acute lasts months while chronic lasts days',
+      'Acute is caused by tobacco while chronic is caused by viruses',
+      'Acute has sudden onset following infection while chronic is persistent',
+      'Acute causes cyanosis while chronic causes fever only'
+    ],
+    answer: 2,
+    concept: 'Acute vs Chronic',
+    rationale: 'Acute bronchitis has sudden onset 1-2 weeks following infection. Chronic is persistent with productive cough for 3+ months in 2 consecutive years.',
+    others: {
+      0: 'The opposite — acute is short, chronic is long.',
+      1: 'The opposite — acute is usually viral, chronic is from tobacco.',
+      3: 'The opposite — chronic causes cyanosis, acute causes fever.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'Which duration must symptoms persist over 2 consecutive years to meet chronic bronchitis criteria?',
+    options: [
+      'At least 1 week',
+      'At least 1 month',
+      'At least 3 months',
+      'At least 9 months'
+    ],
+    answer: 2,
+    concept: '3-Month Rule',
+    rationale: 'Chronic bronchitis requires a productive cough for at least 3 months in 2 consecutive years.',
+    others: {
+      0: '1 week is too short — that suggests acute infection.',
+      1: '1 month is below the diagnostic threshold.',
+      3: '9 months exceeds the criterion (only 3 months needed per year).'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'Which pulmonary disorder causes constant thick mucus production blocking airflow?',
+    options: [
+      'Emphysema with alveolar destruction',
+      'Asthma with bronchospasm and edema',
+      'Acute bronchitis after viral infection',
+      'Chronic bronchitis with mucus overload'
+    ],
+    answer: 3,
+    concept: 'Mucus Source',
+    rationale: 'Chronic bronchitis is characterized by constant, thick mucus production that blocks airflow.',
+    others: {
+      0: 'Emphysema is alveolar destruction, not mucus overload.',
+      1: 'Asthma involves bronchospasm and edema, not constant mucus overload.',
+      2: 'Acute bronchitis has temporary mucus, not constant thick mucus.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'Which is a primary cause/risk factor for acute bronchitis?',
+    options: [
+      'Long-term tobacco smoke exposure',
+      'Viral, bacterial, or mycoplasma infections',
+      'Genetic alpha-1 antitrypsin deficiency',
+      'Chronic exposure to industrial pollutants'
+    ],
+    answer: 1,
+    concept: 'Acute Causes',
+    rationale: 'Acute bronchitis is caused by viral, bacterial, or mycoplasma infections. Viral causes (e.g., rhinovirus) are most common.',
+    others: {
+      0: 'Long-term tobacco causes CHRONIC bronchitis.',
+      2: 'Alpha-1 antitrypsin deficiency causes emphysema.',
+      3: 'Chronic pollutant exposure causes chronic bronchitis.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient presents with sudden cough, fever, chills, malaise, and scratchy throat. Which condition does the nurse suspect?',
+    options: [
+      'Chronic bronchitis',
+      'Emphysema',
+      'Asthma',
+      'Acute bronchitis'
+    ],
+    answer: 3,
+    concept: 'Acute Recognition',
+    rationale: 'Sudden cough, fever, chills, malaise, and scratchy throat are key signs of acute bronchitis (typically following a viral infection).',
+    others: {
+      0: 'Chronic bronchitis has months-long productive cough, not sudden onset.',
+      1: 'Emphysema presents with dyspnea, barrel chest, and pursed-lip breathing.',
+      2: 'Asthma presents with wheezing, chest tightness, and reversible bronchospasm.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient with chronic bronchitis appears cyanotic with peripheral edema and a productive cough. The provider may refer to this presentation as:',
+    options: [
+      '"Blue bloater"',
+      '"Pink puffer"',
+      '"Silent chest"',
+      '"Tripod sitter"'
+    ],
+    answer: 0,
+    concept: 'Blue Bloater Term',
+    rationale: 'Chronic bronchitis patients with cyanosis and edema are referred to as "blue bloaters" — blue from cyanosis, bloated from fluid retention/obesity.',
+    others: {
+      1: '"Pink puffer" describes emphysema patients (thin, barrel chest).',
+      2: '"Silent chest" describes severe asthma with absent breath sounds.',
+      3: '"Tripod sitter" describes positioning in COPD/asthma exacerbation.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient is recovering from a viral infection 1 week ago and now has a sudden cough with fever. The nurse expects the cough will resolve within:',
+    options: [
+      '1-2 days from current symptom onset',
+      '3 months minimum to fully resolve',
+      '6 months at least with treatment',
+      '1-2 weeks total since onset'
+    ],
+    answer: 3,
+    concept: 'Acute Resolution',
+    rationale: 'Acute bronchitis typically lasts 1-2 weeks total following the infection. Symptoms resolve as the airway inflammation subsides.',
+    others: {
+      0: '1-2 days is too short for typical resolution.',
+      1: '3 months would meet chronic criteria, not acute.',
+      2: '6 months exceeds acute resolution time.'
+    }
+  }
+];
+
+// === QUIZ ENGINE ===
+let currentQ = 0;
+let totalPts = 0;
+let answers = [];
+let selectedOption = null;
+
+function begin() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  selectedOption = null;
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+  document.getElementById('progress').style.width = `${(currentQ / questions.length) * 100}%`;
+  document.getElementById('q-stem').textContent = q.stem;
+  const optsHtml = q.options.map((opt, i) => `
+    <div class="option" data-idx="${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${String.fromCharCode(65+i)}.</span>
+      <span>${opt}</span>
+    </div>
+  `).join('');
+  document.getElementById('q-options').innerHTML = optsHtml;
+  document.getElementById('rationale-area').classList.add('hidden');
+  document.getElementById('rationale-area').innerHTML = '';
+  document.getElementById('submit-btn').classList.remove('hidden');
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('next-btn').classList.add('hidden');
+}
+
+function selectOption(idx) {
+  selectedOption = idx;
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.option[data-idx="${idx}"]`).classList.add('selected');
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+  const q = questions[currentQ];
+  const correct = q.answer;
+  const isCorrect = selectedOption === correct;
+  const pts = isCorrect ? 1 : 0;
+  totalPts += pts;
+  answers.push({ q, selected: selectedOption, correct, pts });
+
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.add('locked');
+    el.onclick = null;
+    if (i === correct) el.classList.add('correct');
+    else if (i === selectedOption) el.classList.add('wrong');
+  });
+
+  let othersHtml = '';
+  if (q.others) {
+    othersHtml = '<div class="others-list">';
+    Object.keys(q.others).forEach(k => {
+      othersHtml += `<div><strong>${String.fromCharCode(65+parseInt(k))}.</strong> ${q.others[k]}</div>`;
+    });
+    othersHtml += '</div>';
+  }
+
+  const ratHtml = `
+    <div class="rationale">
+      <span class="concept-pill">${q.concept}</span>
+      <div><strong>${isCorrect ? 'Correct.' : 'Incorrect.'}</strong> ${q.rationale}</div>
+      ${q.deepExplanation ? `<div style="margin-top:8px; color: var(--ink-soft);">${q.deepExplanation}</div>` : ''}
+      ${othersHtml}
+    </div>
+  `;
+  const rArea = document.getElementById('rationale-area');
+  rArea.innerHTML = ratHtml;
+  rArea.classList.remove('hidden');
+  document.getElementById('submit-btn').classList.add('hidden');
+  document.getElementById('next-btn').classList.remove('hidden');
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  const pct = (totalPts / questions.length) * 100;
+  const scoreEl = document.getElementById('r-score');
+  scoreEl.textContent = `${pct.toFixed(0)}%`;
+  if (pct >= 85) scoreEl.classList.add('pass');
+  else if (pct >= 70) scoreEl.classList.add('borderline');
+  else scoreEl.classList.add('fail');
+  document.getElementById('r-pts').textContent = `${totalPts.toFixed(1)} / ${questions.length} points`;
+
+  let msg = '';
+  if (pct >= 90) msg = 'Excellent recall — you know this chapter cold.';
+  else if (pct >= 77) msg = 'Passing — keep reviewing the missed concepts.';
+  else if (pct >= 60) msg = 'Below passing — focus on the missed concepts before the exam.';
+  else msg = 'This chapter needs more review. Re-read the source guide and retake.';
+  document.getElementById('r-msg').textContent = msg;
+
+  const missed = answers.filter(a => a.pts < 1);
+  if (missed.length > 0) {
+    let html = '<h3>Missed Concepts</h3>';
+    missed.forEach(m => {
+      html += `<div class="missed-item">
+        <div class="stem">${m.q.stem}</div>
+        <div class="ans">Correct: ${String.fromCharCode(65+m.correct)}. ${m.q.options[m.correct]}</div>
+        <div class="rat">${m.q.rationale}</div>
+      </div>`;
+    });
+    document.getElementById('missed-section').innerHTML = html;
+  }
+
+  const result = {
+    pct: parseFloat(pct.toFixed(1)),
+    pts: parseFloat(totalPts.toFixed(1)),
+    total: questions.length,
+    date: new Date().toISOString().split('T')[0]
+  };
+  localStorage.setItem('score_upperresp_knowledge', JSON.stringify(result));
+}
+</script>
+</body>
+</html>
