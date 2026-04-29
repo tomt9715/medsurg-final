@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch 18 Upper Respiratory — Deep Drill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a2540; --navy-soft: #1a3a5c;
+  --teal: #0d9488; --teal-pale: #f0fdfa;
+  --purple: #7c3aed; --purple-pale: #f5f3ff;
+  --gold: #f59e0b; --ink: #1a1a1a; --ink-soft: #3a3a3a; --muted: #6b7280;
+  --bg: #fafaf7; --card: #ffffff; --line: #e5e0d5;
+  --correct: #059669; --correct-bg: #ecfdf5;
+  --wrong: #dc2626; --wrong-bg: #fef2f2;
+  --partial: #d97706; --partial-bg: #fffbeb;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; padding: 32px 16px 80px; min-height: 100vh; }
+.container { max-width: 760px; margin: 0 auto; }
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--purple); text-transform: uppercase; margin-bottom: 12px; }
+h1 { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--navy); margin-bottom: 8px; line-height: 1.15; }
+.tagline { color: var(--muted); margin-bottom: 32px; font-size: 16px; }
+.start-card, .question-card, .results-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 32px; margin-bottom: 24px; }
+.start-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+.start-stat { border: 1px solid var(--line); border-radius: 4px; padding: 16px; text-align: center; }
+.start-stat-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--purple); display: block; }
+.start-stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+.btn { background: var(--purple); color: white; border: none; padding: 14px 32px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.btn:hover { background: #6d28d9; }
+.btn:disabled { background: var(--muted); cursor: not-allowed; }
+.btn-secondary { background: var(--navy); }
+.btn-secondary:hover { background: var(--navy-soft); }
+.progress-bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 24px; }
+.progress-fill { height: 100%; background: var(--purple); transition: width 0.3s; }
+.q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+.q-stem { font-size: 18px; color: var(--ink); margin-bottom: 24px; line-height: 1.5; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.option { border: 1.5px solid var(--line); border-radius: 6px; padding: 14px 18px; cursor: pointer; transition: all 0.15s; background: var(--card); font-size: 15px; display: flex; align-items: flex-start; gap: 12px; }
+.option:hover:not(.locked) { border-color: var(--purple); background: var(--purple-pale); }
+.option.selected { border-color: var(--purple); background: var(--purple-pale); }
+.option.correct { border-color: var(--correct); background: var(--correct-bg); }
+.option.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+.option-letter { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--muted); min-width: 18px; }
+.option.correct .option-letter { color: var(--correct); }
+.option.wrong .option-letter { color: var(--wrong); }
+.rationale { background: var(--purple-pale); border-left: 3px solid var(--purple); padding: 16px 20px; border-radius: 0 6px 6px 0; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+.rationale strong { color: var(--navy); }
+.concept-pill { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.5px; background: var(--purple); color: white; padding: 3px 10px; border-radius: 100px; margin-bottom: 10px; text-transform: uppercase; }
+.others-list { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--ink-soft); }
+.others-list div { margin-bottom: 6px; }
+.btn-row { display: flex; gap: 12px; justify-content: flex-end; }
+.results-score { font-family: 'DM Serif Display', serif; font-size: 56px; text-align: center; margin: 12px 0; }
+.results-score.pass { color: var(--correct); }
+.results-score.borderline { color: var(--partial); }
+.results-score.fail { color: var(--wrong); }
+.results-pts { font-family: 'DM Mono', monospace; text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.perf-msg { text-align: center; margin: 16px 0 32px; font-size: 16px; color: var(--ink-soft); font-style: italic; }
+.missed-section h3 { font-family: 'DM Serif Display', serif; color: var(--navy); margin-bottom: 16px; font-size: 22px; }
+.missed-item { border: 1px solid var(--line); border-radius: 6px; padding: 16px; margin-bottom: 12px; background: var(--bg); font-size: 14px; }
+.missed-item .stem { font-weight: 500; margin-bottom: 8px; }
+.missed-item .ans { color: var(--correct); margin-bottom: 8px; font-family: 'DM Mono', monospace; font-size: 13px; }
+.missed-item .rat { color: var(--ink-soft); font-size: 13px; }
+.back-btn { position: fixed; bottom: 20px; left: 20px; background: var(--navy); color: white; text-decoration: none; padding: 10px 18px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 50; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-btn">← STUDY HUB</a>
+<div class="container">
+
+<div id="start-screen">
+  <div class="eyebrow">Deep Drill · Chapter 18</div>
+  <h1>Upper Respiratory Disorders</h1>
+  <p class="tagline">NCLEX-style application: differentiating acute vs chronic bronchitis presentations and recognizing related disorders.</p>
+  <div class="start-card">
+    <div class="start-stats">
+      <div class="start-stat"><span class="start-stat-num">15</span><span class="start-stat-label">Questions</span></div>
+      <div class="start-stat"><span class="start-stat-num">MC</span><span class="start-stat-label">Format</span></div>
+      <div class="start-stat"><span class="start-stat-num">Yes</span><span class="start-stat-label">Rationale</span></div>
+    </div>
+    <p style="margin-bottom: 20px; color: var(--ink-soft);">Higher-difficulty NCLEX-style scenarios. Apply your knowledge to clinical-judgment situations.</p>
+    <button class="btn" onclick="begin()">Begin</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="hidden">
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="question-card">
+    <div class="q-header">
+      <span id="q-counter">Question 1 of 15</span>
+      <span id="q-points">0 pts</span>
+    </div>
+    <div class="q-stem" id="q-stem"></div>
+    <div class="options" id="q-options"></div>
+    <div id="rationale-area" class="hidden"></div>
+    <div class="btn-row">
+      <button class="btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+      <button class="btn btn-secondary hidden" id="next-btn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div id="results-screen" class="hidden">
+  <div class="results-card">
+    <div class="eyebrow">Results · Deep Drill</div>
+    <h1>Upper Respiratory</h1>
+    <div class="results-score" id="r-score">0%</div>
+    <div class="results-pts" id="r-pts">0 / 15 points</div>
+    <div class="perf-msg" id="r-msg"></div>
+    <div class="btn-row" style="justify-content: center; margin-bottom: 32px;">
+      <button class="btn" onclick="location.reload()">Retry Quiz</button>
+      <a href="index.html" class="btn btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center;">Back to Hub</a>
+    </div>
+    <div class="missed-section" id="missed-section"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient comes to the clinic with a 5-day history of fever, chills, malaise, and a sudden cough that started after a cold last week. Which condition does the nurse suspect?',
+    options: [
+      'Chronic bronchitis',
+      'Acute bronchitis',
+      'Emphysema',
+      'Asthma'
+    ],
+    answer: 1,
+    concept: 'Acute Recognition',
+    rationale: 'Sudden cough with fever, chills, and malaise following a recent infection (1-2 weeks duration) is classic for acute bronchitis.',
+    others: {
+      0: 'Chronic bronchitis requires productive cough ≥3 months in 2 consecutive years — not 5 days.',
+      2: 'Emphysema presents with dyspnea, barrel chest, and pursed-lip breathing, not acute fever.',
+      3: 'Asthma presents with wheezing and reversible bronchospasm, not post-infectious cough.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A 62-year-old smoker reports a productive cough most days for the past 4 months and reports the same pattern last winter. Which condition does the nurse suspect?',
+    options: [
+      'Acute bronchitis',
+      'Asthma',
+      'Pulmonary fibrosis',
+      'Chronic bronchitis'
+    ],
+    answer: 3,
+    concept: 'Chronic Recognition',
+    rationale: 'Productive cough ≥3 months in 2 consecutive years meets the diagnostic criteria for chronic bronchitis. Smoking history reinforces the diagnosis (tobacco causes 80-90% of cases).',
+    others: {
+      0: 'Acute bronchitis lasts only 1-2 weeks, not months across 2 years.',
+      1: 'Asthma presents with wheezing and airway hyperresponsiveness, not chronic productive cough.',
+      2: 'Pulmonary fibrosis causes dyspnea and dry cough, not productive cough.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient with chronic bronchitis appears cyanotic with peripheral edema and reports persistent thick mucus production. Which underlying mechanism explains the mucus?',
+    options: [
+      'Mucus overload from constant inflammation of the bronchi',
+      'Allergen-triggered IgE-mediated bronchospasm',
+      'Alveolar wall destruction with air trapping',
+      'Bacterial superinfection of the upper airway'
+    ],
+    answer: 0,
+    concept: 'Mucus Mechanism',
+    rationale: 'Chronic bronchitis is bronchi inflammation with mucus overload — constant thick mucus blocks airflow, causing the "blue bloater" appearance.',
+    others: {
+      1: 'IgE bronchospasm describes asthma, not chronic bronchitis.',
+      2: 'Alveolar destruction describes emphysema.',
+      3: 'Bacterial superinfection is acute, not the chronic underlying mechanism.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient with acute bronchitis asks the nurse how long the symptoms will last. What is the best response?',
+    options: [
+      '"Symptoms will resolve in just a few days with rest."',
+      '"Symptoms typically last 1 to 2 weeks following the infection."',
+      '"You will likely have a productive cough for 3 to 6 months."',
+      '"Symptoms will likely last 2 years before fully resolving."'
+    ],
+    answer: 1,
+    concept: 'Acute Timeline Education',
+    rationale: 'Acute bronchitis lasts 1-2 weeks following the infection. This sets accurate patient expectations.',
+    others: {
+      0: 'A few days underestimates typical duration.',
+      2: '3-6 months would meet chronic bronchitis criteria.',
+      3: '2 years describes the chronic bronchitis diagnostic period.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A nurse is teaching a patient newly diagnosed with chronic bronchitis. Which statement by the patient indicates understanding?',
+    options: [
+      '"I should keep smoking since the damage is already done."',
+      '"This is the same as having acute bronchitis from a virus."',
+      '"My productive cough will resolve in about 2 weeks."',
+      '"Stopping smoking can slow the disease progression."'
+    ],
+    answer: 3,
+    concept: 'Chronic Education',
+    rationale: 'Tobacco causes 80-90% of chronic bronchitis cases. Stopping smoking is the most important intervention to slow progression.',
+    others: {
+      0: 'Continued smoking accelerates damage; cessation always benefits.',
+      1: 'Acute bronchitis is short-term and viral; chronic is long-term and tobacco-driven.',
+      2: 'Productive cough in chronic bronchitis is persistent for months/years.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A nurse is comparing four patients in clinic. Which patient meets the diagnostic criteria for chronic bronchitis?',
+    options: [
+      'A patient with productive cough for 4 months last year and 4 months this year',
+      'A patient with sudden cough and fever for 10 days following a viral URI',
+      'A patient with wheezing and chest tightness triggered by cold air',
+      'A patient with dyspnea on exertion and a barrel-chested appearance'
+    ],
+    answer: 0,
+    concept: 'Diagnostic Criteria Application',
+    rationale: 'Productive cough ≥3 months in 2 consecutive years meets the diagnostic criteria for chronic bronchitis.',
+    others: {
+      1: 'Sudden cough lasting 10 days describes acute bronchitis.',
+      2: 'Wheezing triggered by cold air describes asthma.',
+      3: 'Barrel chest and dyspnea describe emphysema.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient with chronic bronchitis asks why they appear different from another patient at the clinic with emphysema. The nurse explains chronic bronchitis is associated with which appearance?',
+    options: [
+      'Thin and barrel-chested ("pink puffer")',
+      'Tan, muscular, and well-hydrated',
+      'Pale and underweight with clubbed fingers',
+      'Cyanotic and obese ("blue bloater")'
+    ],
+    answer: 3,
+    concept: 'Blue Bloater vs Pink Puffer',
+    rationale: 'Chronic bronchitis patients are typically cyanotic and obese ("blue bloater"). Emphysema patients are typically thin and barrel-chested ("pink puffer").',
+    others: {
+      0: 'That describes the emphysema "pink puffer".',
+      1: 'No clinical correlation with chronic bronchitis.',
+      2: 'Pale and underweight with clubbing fits other chronic conditions, not chronic bronchitis.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient diagnosed with acute bronchitis asks if antibiotics will help. What is the best nursing response?',
+    options: [
+      '"Antibiotics will be prescribed regardless of cause."',
+      '"Acute bronchitis is usually viral, so antibiotics often don\'t help."',
+      '"Antibiotics are required for all respiratory infections."',
+      '"You should request antibiotics from the provider immediately."'
+    ],
+    answer: 1,
+    concept: 'Viral Etiology Education',
+    rationale: 'Acute bronchitis is usually caused by a viral infection, so antibiotics typically do not help. They may be prescribed if a bacterial cause is suspected.',
+    others: {
+      0: 'Antibiotics are not indicated for viral infections.',
+      2: 'Not all respiratory infections require antibiotics — viruses do not respond.',
+      3: 'Inappropriately escalating to antibiotic demand is not clinically appropriate.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A nurse is reviewing risk factor education for a patient at risk for chronic bronchitis. Which is the MOST important modifiable risk factor to address?',
+    options: [
+      'Genetic predisposition',
+      'Aging process',
+      'Tobacco smoke exposure',
+      'Geographic altitude'
+    ],
+    answer: 2,
+    concept: 'Modifiable Risk',
+    rationale: 'Tobacco smoke is the cause of 80-90% of chronic bronchitis cases — and is the #1 modifiable risk factor. Smoking cessation is the highest-impact intervention.',
+    others: {
+      0: 'Genetic factors are not modifiable.',
+      1: 'Aging is unmodifiable.',
+      3: 'Altitude is generally unmodifiable for most patients.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient with a recent viral URI now reports a 7-day history of cough, low-grade fever, and a scratchy throat. Vital signs are stable. What is the most appropriate nursing response?',
+    options: [
+      'Recommend immediate hospitalization for severe infection',
+      'Reassure that acute bronchitis usually resolves in 1-2 weeks',
+      'Tell the patient symptoms must persist 3 months for diagnosis',
+      'Recommend daily inhaled corticosteroids long-term'
+    ],
+    answer: 1,
+    concept: 'Acute Reassurance',
+    rationale: 'Acute bronchitis lasts 1-2 weeks following infection. Stable vitals and typical post-viral symptoms support reassurance and supportive care.',
+    others: {
+      0: 'Hospitalization is not warranted for stable acute bronchitis.',
+      2: 'The 3-month/2-year criteria are for chronic bronchitis diagnosis.',
+      3: 'Long-term corticosteroids are not first-line for acute bronchitis.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient with chronic bronchitis asks why they keep getting respiratory infections. The nurse\'s best response addresses which concept?',
+    options: [
+      'Constant thick mucus blocks airflow and traps pathogens',
+      'Bronchospasm narrows airways and prevents air movement',
+      'Alveolar destruction reduces gas exchange capacity',
+      'Pleural effusions accumulate and compress the lungs'
+    ],
+    answer: 0,
+    concept: 'Mucus and Infection Risk',
+    rationale: 'Chronic bronchitis features mucus overload — constant thick mucus that blocks airflow. The trapped mucus harbors pathogens, increasing infection risk.',
+    others: {
+      1: 'Bronchospasm describes asthma airway physiology.',
+      2: 'Alveolar destruction describes emphysema.',
+      3: 'Pleural effusions are a separate complication, not the chronic bronchitis mechanism.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A nurse is triaging four patients in clinic. Which patient should the nurse see FIRST?',
+    options: [
+      'A patient with chronic bronchitis reporting baseline cough and mucus',
+      'A patient on day 8 of acute bronchitis reporting improving fatigue',
+      'A patient with a 5-day cough requesting prescription cough syrup',
+      'A patient with chronic bronchitis appearing increasingly cyanotic with new dyspnea'
+    ],
+    answer: 3,
+    concept: 'Priority Triage',
+    rationale: 'Increasing cyanosis and new dyspnea in a chronic bronchitis patient suggests acute decompensation — possibly acute on chronic respiratory failure. Priority assessment.',
+    others: {
+      0: 'Baseline symptoms are stable and not urgent.',
+      1: 'Improving fatigue indicates recovery; not urgent.',
+      2: 'Routine cough management is not urgent.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient asks how to differentiate acute from chronic bronchitis. The nurse\'s best teaching response includes which key distinction?',
+    options: [
+      'Both are caused by tobacco smoke, with chronic being more severe over time',
+      'Acute = sudden post-infection 1-2 weeks; chronic = productive cough ≥3 months × 2 years',
+      'Chronic resolves with antibiotics while acute requires steroid use long-term',
+      'Acute bronchitis affects only children, while chronic affects only older adults'
+    ],
+    answer: 1,
+    concept: 'Acute vs Chronic Teaching',
+    rationale: 'Acute bronchitis = sudden onset following infection, lasts 1-2 weeks. Chronic bronchitis = productive cough ≥3 months in 2 consecutive years.',
+    others: {
+      0: 'Acute is usually viral, not tobacco-related.',
+      2: 'Chronic does not resolve with antibiotics; it is a chronic disease.',
+      3: 'Both can affect any age group — chronic is more common in older adults.'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient with chronic bronchitis is admitted with worsening symptoms. Which finding suggests progression of disease rather than acute exacerbation?',
+    options: [
+      'Sudden onset of fever with productive cough this week',
+      'New purulent green sputum and chills starting yesterday',
+      'Increasing cyanosis with peripheral edema over months',
+      'Acute chest pain and hemoptysis since this morning'
+    ],
+    answer: 2,
+    concept: 'Progression vs Exacerbation',
+    rationale: 'Increasing cyanosis with peripheral edema developing over months suggests disease progression — worsening "blue bloater" features tied to chronic hypoxemia and right heart strain.',
+    others: {
+      0: 'Sudden fever with productive cough this week suggests acute infection/exacerbation.',
+      1: 'New purulent sputum with chills suggests acute bacterial infection.',
+      3: 'Acute chest pain and hemoptysis suggest a different acute event (e.g., PE).'
+    }
+  },
+  {
+    topic: 'UpperResp',
+    type: 'standard',
+    stem: 'A patient with acute bronchitis is being discharged. Which statement indicates the patient correctly understands self-care?',
+    options: [
+      '"I will continue smoking since this is just a viral cough."',
+      '"I should expect this cough to last for the next 6 months."',
+      '"I will rest, stay hydrated, and watch for worsening symptoms."',
+      '"I should take leftover antibiotics from a previous infection."'
+    ],
+    answer: 2,
+    concept: 'Acute Self-Care',
+    rationale: 'Rest, hydration, and monitoring for worsening symptoms are appropriate self-care for acute bronchitis (typically viral, 1-2 week course).',
+    others: {
+      0: 'Smoking worsens any respiratory illness and increases chronic bronchitis risk.',
+      1: 'Acute bronchitis lasts 1-2 weeks, not 6 months.',
+      3: 'Taking leftover antibiotics is unsafe and inappropriate.'
+    }
+  }
+];
+
+// === QUIZ ENGINE ===
+let currentQ = 0;
+let totalPts = 0;
+let answers = [];
+let selectedOption = null;
+
+function begin() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  selectedOption = null;
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+  document.getElementById('progress').style.width = `${(currentQ / questions.length) * 100}%`;
+  document.getElementById('q-stem').textContent = q.stem;
+  const optsHtml = q.options.map((opt, i) => `
+    <div class="option" data-idx="${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${String.fromCharCode(65+i)}.</span>
+      <span>${opt}</span>
+    </div>
+  `).join('');
+  document.getElementById('q-options').innerHTML = optsHtml;
+  document.getElementById('rationale-area').classList.add('hidden');
+  document.getElementById('rationale-area').innerHTML = '';
+  document.getElementById('submit-btn').classList.remove('hidden');
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('next-btn').classList.add('hidden');
+}
+
+function selectOption(idx) {
+  selectedOption = idx;
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.option[data-idx="${idx}"]`).classList.add('selected');
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+  const q = questions[currentQ];
+  const correct = q.answer;
+  const isCorrect = selectedOption === correct;
+  const pts = isCorrect ? 1 : 0;
+  totalPts += pts;
+  answers.push({ q, selected: selectedOption, correct, pts });
+
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.add('locked');
+    el.onclick = null;
+    if (i === correct) el.classList.add('correct');
+    else if (i === selectedOption) el.classList.add('wrong');
+  });
+
+  let othersHtml = '';
+  if (q.others) {
+    othersHtml = '<div class="others-list">';
+    Object.keys(q.others).forEach(k => {
+      othersHtml += `<div><strong>${String.fromCharCode(65+parseInt(k))}.</strong> ${q.others[k]}</div>`;
+    });
+    othersHtml += '</div>';
+  }
+
+  const ratHtml = `
+    <div class="rationale">
+      <span class="concept-pill">${q.concept}</span>
+      <div><strong>${isCorrect ? 'Correct.' : 'Incorrect.'}</strong> ${q.rationale}</div>
+      ${q.deepExplanation ? `<div style="margin-top:8px; color: var(--ink-soft);">${q.deepExplanation}</div>` : ''}
+      ${othersHtml}
+    </div>
+  `;
+  const rArea = document.getElementById('rationale-area');
+  rArea.innerHTML = ratHtml;
+  rArea.classList.remove('hidden');
+  document.getElementById('submit-btn').classList.add('hidden');
+  document.getElementById('next-btn').classList.remove('hidden');
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  const pct = (totalPts / questions.length) * 100;
+  const scoreEl = document.getElementById('r-score');
+  scoreEl.textContent = `${pct.toFixed(0)}%`;
+  if (pct >= 85) scoreEl.classList.add('pass');
+  else if (pct >= 70) scoreEl.classList.add('borderline');
+  else scoreEl.classList.add('fail');
+  document.getElementById('r-pts').textContent = `${totalPts.toFixed(1)} / ${questions.length} points`;
+
+  let msg = '';
+  if (pct >= 90) msg = 'Excellent — you handle priority decisions well.';
+  else if (pct >= 77) msg = 'Passing — review missed scenarios for the test.';
+  else if (pct >= 60) msg = 'Below passing — focus on priority and safety judgments.';
+  else msg = 'This chapter needs deeper review. Re-read scenarios and retake.';
+  document.getElementById('r-msg').textContent = msg;
+
+  const missed = answers.filter(a => a.pts < 1);
+  if (missed.length > 0) {
+    let html = '<h3>Missed Concepts</h3>';
+    missed.forEach(m => {
+      html += `<div class="missed-item">
+        <div class="stem">${m.q.stem}</div>
+        <div class="ans">Correct: ${String.fromCharCode(65+m.correct)}. ${m.q.options[m.correct]}</div>
+        <div class="rat">${m.q.rationale}</div>
+      </div>`;
+    });
+    document.getElementById('missed-section').innerHTML = html;
+  }
+
+  const result = {
+    pct: parseFloat(pct.toFixed(1)),
+    pts: parseFloat(totalPts.toFixed(1)),
+    total: questions.length,
+    date: new Date().toISOString().split('T')[0]
+  };
+  localStorage.setItem('score_upperresp_deepdrill', JSON.stringify(result));
+}
+</script>
+</body>
+</html>
