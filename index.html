@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedSurg I Final — Study Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a2540; --navy-soft: #1a3a5c;
+  --teal: #0d9488; --teal-pale: #f0fdfa;
+  --purple: #7c3aed; --purple-pale: #f5f3ff;
+  --gold: #f59e0b; --gold-pale: #fef3c7;
+  --ink: #1a1a1a; --ink-soft: #3a3a3a; --muted: #6b7280;
+  --bg: #fafaf7; --card: #ffffff; --line: #e5e0d5;
+  --pass: #059669; --partial: #d97706; --fail: #dc2626;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; padding: 40px 16px 80px; min-height: 100vh; }
+.container { max-width: 880px; margin: 0 auto; }
+
+/* Hero */
+.hero { text-align: center; margin-bottom: 48px; }
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; color: var(--teal); text-transform: uppercase; margin-bottom: 16px; }
+h1 { font-family: 'DM Serif Display', serif; font-size: 48px; color: var(--navy); margin-bottom: 12px; line-height: 1.1; }
+.tagline { color: var(--muted); font-size: 17px; max-width: 540px; margin: 0 auto; }
+
+/* Stat dashboard */
+.stat-dashboard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px; }
+.stat-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 20px 16px; text-align: center; }
+.stat-num { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--navy); display: block; line-height: 1; margin-bottom: 6px; }
+.stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+
+/* Simulator card */
+.simulator-card { background: var(--navy); border-radius: 10px; padding: 32px; margin-bottom: 48px; color: white; display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; }
+.sim-info .sim-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 12px; }
+.sim-info h2 { font-family: 'DM Serif Display', serif; font-size: 30px; color: white; margin-bottom: 8px; }
+.sim-info p { color: rgba(255,255,255,0.7); font-size: 14px; }
+.sim-action { text-align: center; }
+.sim-score { font-family: 'DM Serif Display', serif; font-size: 56px; color: var(--gold); line-height: 1; margin-bottom: 4px; }
+.sim-score.no-attempt { color: rgba(255,255,255,0.4); font-size: 28px; font-style: italic; }
+.sim-status { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; }
+.sim-status.pass { color: var(--gold); }
+.sim-status.fail { color: #fca5a5; }
+.sim-btn { background: var(--gold); color: var(--navy); border: none; padding: 12px 28px; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700; border-radius: 4px; cursor: pointer; text-decoration: none; display: inline-block; }
+.sim-btn:hover { background: #d97706; }
+.sim-btn.disabled { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); cursor: not-allowed; pointer-events: none; }
+
+/* Section header */
+.section-header { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 12px; margin-bottom: 20px; border-bottom: 1px solid var(--line); }
+.section-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 2px; color: var(--ink-soft); text-transform: uppercase; }
+.section-meta { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+
+/* Topic cards */
+.topic-grid { display: grid; gap: 12px; margin-bottom: 40px; }
+.topic-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.topic-header { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+.topic-name { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--navy); margin-bottom: 2px; }
+.topic-desc { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.3px; }
+.topic-weight { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--ink-soft); background: var(--bg); padding: 4px 10px; border-radius: 4px; letter-spacing: 0.5px; }
+
+/* Quiz subcards */
+.quiz-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); }
+.quiz-subcard { background: var(--card); padding: 18px 20px; text-decoration: none; color: var(--ink); display: block; transition: background 0.15s; }
+.quiz-subcard:hover { background: var(--bg); }
+.quiz-subcard.coming-soon { background: var(--bg); cursor: not-allowed; opacity: 0.7; }
+.quiz-subcard.coming-soon:hover { background: var(--bg); }
+.quiz-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.quiz-label.kc { color: var(--teal); }
+.quiz-label.dd { color: var(--purple); }
+.quiz-score { font-family: 'DM Serif Display', serif; font-size: 36px; line-height: 1; margin-bottom: 4px; }
+.quiz-score.pass { color: var(--pass); }
+.quiz-score.partial { color: var(--partial); }
+.quiz-score.fail { color: var(--fail); }
+.quiz-score.none { color: var(--muted); font-size: 18px; font-style: italic; font-family: 'Outfit', sans-serif; }
+.quiz-meta { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+
+/* Footer */
+.footer { margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+.legend-swatch { width: 12px; height: 12px; border-radius: 2px; }
+.reset-btn { background: none; border: 1px solid var(--line); padding: 8px 14px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); border-radius: 4px; cursor: pointer; letter-spacing: 0.5px; }
+.reset-btn:hover { color: var(--fail); border-color: var(--fail); }
+
+@media (max-width: 600px) {
+  .stat-dashboard { grid-template-columns: repeat(2, 1fr); }
+  .simulator-card { grid-template-columns: 1fr; text-align: center; }
+  h1 { font-size: 36px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="hero">
+  <div class="eyebrow">MedSurg I · Spring 2026</div>
+  <h1>Final Exam Study Hub</h1>
+  <p class="tagline">Knowledge Checks build foundational recall. Deep Drills sharpen NCLEX-style judgment. Both feed your readiness for the simulator.</p>
+</div>
+
+<div class="stat-dashboard">
+  <div class="stat-card">
+    <span class="stat-num">75</span>
+    <span class="stat-label">Final Q Count</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-num">77%</span>
+    <span class="stat-label">Pass Threshold</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-num" id="bank-size">120</span>
+    <span class="stat-label">Practice Bank</span>
+  </div>
+  <div class="stat-card">
+    <span class="stat-num" id="avg-score">—</span>
+    <span class="stat-label">Your Avg Score</span>
+  </div>
+</div>
+
+<div class="simulator-card">
+  <div class="sim-info">
+    <div class="sim-eyebrow">Final Exam Simulator</div>
+    <h2>75-Question Simulation</h2>
+    <p>All sections weighted to blueprint. Pass at 77%. Fresh questions not in topic quizzes.</p>
+  </div>
+  <div class="sim-action">
+    <div class="sim-score no-attempt" id="sim-score">Not attempted</div>
+    <div class="sim-status" id="sim-status">&nbsp;</div>
+    <a href="exam_simulator.html" class="sim-btn disabled" id="sim-btn">Coming Soon</a>
+  </div>
+</div>
+
+<div class="section-header">
+  <span class="section-title">All Topics</span>
+  <span class="section-meta" id="topics-meta">Building in progress · 4 of 21 chapters</span>
+</div>
+
+<div class="topic-grid" id="topic-grid">
+  <!-- Populated by JS -->
+</div>
+
+<div class="footer">
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch" style="background: var(--pass);"></span>≥85% Pass</div>
+    <div class="legend-item"><span class="legend-swatch" style="background: var(--partial);"></span>70-84% Borderline</div>
+    <div class="legend-item"><span class="legend-swatch" style="background: var(--fail);"></span>&lt;70% Fail</div>
+  </div>
+  <button class="reset-btn" onclick="resetAllScores()">Reset all scores</button>
+</div>
+
+</div>
+
+<script>
+// Topic configuration - update as more chapters are built
+const topics = [
+  { ch: '12', name: 'Oncology', desc: 'Chemo, neutropenia, radiation, CBC monitoring', weight: 6, key: 'oncology', kcFile: 'ch12_oncology_kc.html', ddFile: 'ch12_oncology_dd.html', kcReady: true, ddReady: true },
+  { ch: '15', name: 'Intraoperative', desc: 'OR roles, zones, infection prevention, MH', weight: 1, key: 'intraoperative', kcFile: 'ch15_intraoperative_kc.html', ddFile: 'ch15_intraoperative_dd.html', kcReady: true, ddReady: true },
+  { ch: '16', name: 'Postoperative', desc: 'Complications by system, wound care, evisceration', weight: 4, key: 'postoperative', kcFile: 'ch16_postoperative_kc.html', ddFile: 'ch16_postoperative_dd.html', kcReady: true, ddReady: true },
+  { ch: '18', name: 'Upper Respiratory', desc: 'Acute vs chronic bronchitis', weight: 2, key: 'upperresp', kcFile: 'ch18_upperresp_kc.html', ddFile: 'ch18_upperresp_dd.html', kcReady: true, ddReady: false },
+  { ch: '20', name: 'Chronic Pulmonary', desc: 'Emphysema, asthma, sleep apnea, O₂ delivery', weight: 6, key: 'chronicpulm', kcReady: false, ddReady: false },
+  { ch: '29', name: 'Nonmalignant Hematologic', desc: 'Thrombocytopenia, leukopenia, anemias, sickle cell', weight: 5, key: 'nonmalighem', kcReady: false, ddReady: false },
+  { ch: '30', name: 'Hematologic Disorders', desc: 'Polycythemia vera, leukemias (AML/CML/ALL/CLL)', weight: 3, key: 'hematdisorders', kcReady: false, ddReady: false },
+  { ch: '23', name: 'Coronary Vascular', desc: 'Angina, MI/ACS, nitroglycerin teaching', weight: 5, key: 'coronary', kcReady: false, ddReady: false },
+  { ch: '24', name: 'Structural/Infectious Cardiac', desc: 'Endocarditis, rheumatic fever, aortic stenosis', weight: 3, key: 'structuralcardiac', kcReady: false, ddReady: false },
+  { ch: '26', name: 'Vascular Disorders', desc: 'Raynaud, PE, DVT, venous vs arterial', weight: 5, key: 'vascular', kcReady: false, ddReady: false },
+  { ch: '25', name: 'Heart Failure', desc: 'L vs R sided HF, pulmonary edema, fluid excess', weight: 4, key: 'heartfailure', kcReady: false, ddReady: false },
+  { ch: '27', name: 'Hypertension', desc: 'Long-term complications, DASH diet, education', weight: 3, key: 'hypertension', kcReady: false, ddReady: false },
+  { ch: '32', name: 'Immune Deficiency', desc: 'HIV/AIDS stages, opportunistic infections, HAART', weight: 4, key: 'immune', kcReady: false, ddReady: false },
+  { ch: '33', name: 'Allergic Disorders', desc: 'Atopic dermatitis, anaphylaxis, allergic rhinitis', weight: 3, key: 'allergic', kcReady: false, ddReady: false },
+  { ch: '34', name: 'Rheumatic Disorders', desc: 'RA and SLE — patho, pharm, education', weight: 2, key: 'rheumatic', kcReady: false, ddReady: false },
+  { ch: '37', name: 'Musculoskeletal Trauma', desc: 'Fractures, 6 P\'s, cast care, compartment syndrome', weight: 3, key: 'mskTrauma', kcReady: false, ddReady: false },
+  { ch: '39', name: 'Oral & Esophageal', desc: 'GERD, parenteral nutrition / TPN', weight: 2, key: 'oralesoph', kcReady: false, ddReady: false },
+  { ch: '40', name: 'Gastric & Duodenal', desc: 'Gastritis, peptic ulcer disease, perforation', weight: 2, key: 'gastric', kcReady: false, ddReady: false },
+  { ch: '41', name: 'Intestinal & Rectal', desc: 'Crohn\'s, ulcerative colitis, constipation', weight: 3, key: 'intestinal', kcReady: false, ddReady: false },
+  { ch: '46u', name: 'Urinary Disorders', desc: 'UTI, cystitis, renal calculi, pyelonephritis', weight: 4, key: 'urinary', kcReady: false, ddReady: false },
+  { ch: '46d', name: 'Diabetes', desc: 'DKA vs HHS, hypoglycemia, complications', weight: 5, key: 'diabetes', kcReady: false, ddReady: false }
+];
+
+function getScore(key, type) {
+  try {
+    const raw = localStorage.getItem(`score_${key}_${type}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) { return null; }
+}
+
+function scoreClass(pct) {
+  if (pct >= 85) return 'pass';
+  if (pct >= 70) return 'partial';
+  return 'fail';
+}
+
+function renderQuizSubcard(topic, type) {
+  const isKC = type === 'kc';
+  const ready = isKC ? topic.kcReady : topic.ddReady;
+  const file = isKC ? topic.kcFile : topic.ddFile;
+  const labelText = isKC ? 'Knowledge Check' : 'Deep Drill';
+  const labelClass = isKC ? 'kc' : 'dd';
+  const scoreKey = isKC ? 'knowledge' : 'deepdrill';
+
+  if (!ready) {
+    return `<div class="quiz-subcard coming-soon">
+      <div class="quiz-label ${labelClass}">${labelText}</div>
+      <div class="quiz-score none">Coming soon</div>
+      <div class="quiz-meta">Not yet built</div>
+    </div>`;
+  }
+
+  const score = getScore(topic.key, scoreKey);
+  let scoreHtml, metaHtml;
+  if (score) {
+    scoreHtml = `<div class="quiz-score ${scoreClass(score.pct)}">${score.pct.toFixed(0)}%</div>`;
+    metaHtml = `<div class="quiz-meta">${score.pts} / ${score.total} · ${score.date}</div>`;
+  } else {
+    scoreHtml = `<div class="quiz-score none">Not attempted</div>`;
+    metaHtml = `<div class="quiz-meta">Click to start</div>`;
+  }
+  return `<a href="${file}" class="quiz-subcard">
+    <div class="quiz-label ${labelClass}">${labelText}</div>
+    ${scoreHtml}
+    ${metaHtml}
+  </a>`;
+}
+
+function renderTopics() {
+  const grid = document.getElementById('topic-grid');
+  grid.innerHTML = topics.map(t => `
+    <div class="topic-card">
+      <div class="topic-header">
+        <div>
+          <div class="topic-name">Ch ${t.ch} · ${t.name}</div>
+          <div class="topic-desc">${t.desc}</div>
+        </div>
+        <div class="topic-weight">${t.weight} / 75</div>
+      </div>
+      <div class="quiz-row">
+        ${renderQuizSubcard(t, 'kc')}
+        ${renderQuizSubcard(t, 'dd')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function calculateAverage() {
+  const allScores = [];
+  topics.forEach(t => {
+    const kc = getScore(t.key, 'knowledge');
+    const dd = getScore(t.key, 'deepdrill');
+    if (kc) allScores.push(kc.pct);
+    if (dd) allScores.push(dd.pct);
+  });
+  if (allScores.length === 0) {
+    document.getElementById('avg-score').textContent = '—';
+  } else {
+    const avg = allScores.reduce((a,b) => a+b, 0) / allScores.length;
+    document.getElementById('avg-score').textContent = avg.toFixed(0) + '%';
+  }
+}
+
+function calculateBankSize() {
+  // Sum questions in built quizzes - 25 for full chapters, 15 for right-sized
+  const builtCounts = topics.filter(t => t.kcReady || t.ddReady).map(t => {
+    let count = 0;
+    // Ch 18 is 15 Q each, others are 25 Q each
+    const qPerQuiz = t.ch === '18' ? 15 : 25;
+    if (t.kcReady) count += qPerQuiz;
+    if (t.ddReady) count += qPerQuiz;
+    return count;
+  });
+  const total = builtCounts.reduce((a,b) => a+b, 0);
+  document.getElementById('bank-size').textContent = total;
+}
+
+function renderSimulator() {
+  const sim = getScore('simulator', 'attempt');
+  const scoreEl = document.getElementById('sim-score');
+  const statusEl = document.getElementById('sim-status');
+  const btnEl = document.getElementById('sim-btn');
+
+  // Check if simulator file exists by attempting fetch HEAD
+  fetch('exam_simulator.html', { method: 'HEAD' })
+    .then(r => {
+      if (r.ok) {
+        btnEl.classList.remove('disabled');
+        btnEl.textContent = sim ? 'Retake Simulator' : 'Start Simulator';
+      }
+    })
+    .catch(() => {});
+
+  if (sim) {
+    scoreEl.textContent = sim.pct.toFixed(0) + '%';
+    scoreEl.classList.remove('no-attempt');
+    if (sim.pct >= 77) {
+      scoreEl.style.color = 'var(--gold)';
+      statusEl.textContent = '✓ Passing';
+      statusEl.classList.add('pass');
+    } else {
+      scoreEl.style.color = '#fca5a5';
+      statusEl.textContent = '✗ Below Pass';
+      statusEl.classList.add('fail');
+    }
+  }
+}
+
+function resetAllScores() {
+  if (!confirm('Reset ALL scores? This cannot be undone.')) return;
+  Object.keys(localStorage).filter(k => k.startsWith('score_')).forEach(k => localStorage.removeItem(k));
+  location.reload();
+}
+
+renderTopics();
+calculateAverage();
+calculateBankSize();
+renderSimulator();
+
+// Update topics-meta count
+const builtCount = topics.filter(t => t.kcReady && t.ddReady).length;
+const partialCount = topics.filter(t => t.kcReady && !t.ddReady).length;
+const totalChapters = topics.length;
+const metaText = partialCount > 0
+  ? `${builtCount} of ${totalChapters} fully built · ${partialCount} in progress`
+  : `${builtCount} of ${totalChapters} chapters built`;
+document.getElementById('topics-meta').textContent = metaText;
+</script>
+</body>
+</html>
