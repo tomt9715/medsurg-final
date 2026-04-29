@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch 20 Chronic Pulmonary — Knowledge Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a2540; --navy-soft: #1a3a5c;
+  --teal: #0d9488; --teal-pale: #f0fdfa;
+  --purple: #7c3aed; --purple-pale: #f5f3ff;
+  --gold: #f59e0b; --ink: #1a1a1a; --ink-soft: #3a3a3a; --muted: #6b7280;
+  --bg: #fafaf7; --card: #ffffff; --line: #e5e0d5;
+  --correct: #059669; --correct-bg: #ecfdf5;
+  --wrong: #dc2626; --wrong-bg: #fef2f2;
+  --partial: #d97706; --partial-bg: #fffbeb;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; padding: 32px 16px 80px; min-height: 100vh; }
+.container { max-width: 760px; margin: 0 auto; }
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--teal); text-transform: uppercase; margin-bottom: 12px; }
+h1 { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--navy); margin-bottom: 8px; line-height: 1.15; }
+.tagline { color: var(--muted); margin-bottom: 32px; font-size: 16px; }
+.start-card, .question-card, .results-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 32px; margin-bottom: 24px; }
+.start-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+.start-stat { border: 1px solid var(--line); border-radius: 4px; padding: 16px; text-align: center; }
+.start-stat-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--teal); display: block; }
+.start-stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+.btn { background: var(--teal); color: white; border: none; padding: 14px 32px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.btn:hover { background: #0b7a70; }
+.btn:disabled { background: var(--muted); cursor: not-allowed; }
+.btn-secondary { background: var(--navy); }
+.btn-secondary:hover { background: var(--navy-soft); }
+.progress-bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 24px; }
+.progress-fill { height: 100%; background: var(--teal); transition: width 0.3s; }
+.q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+.q-stem { font-size: 18px; color: var(--ink); margin-bottom: 24px; line-height: 1.5; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.option { border: 1.5px solid var(--line); border-radius: 6px; padding: 14px 18px; cursor: pointer; transition: all 0.15s; background: var(--card); font-size: 15px; display: flex; align-items: flex-start; gap: 12px; }
+.option:hover:not(.locked) { border-color: var(--teal); background: var(--teal-pale); }
+.option.selected { border-color: var(--teal); background: var(--teal-pale); }
+.option.correct { border-color: var(--correct); background: var(--correct-bg); }
+.option.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+.option-letter { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--muted); min-width: 18px; }
+.option.correct .option-letter { color: var(--correct); }
+.option.wrong .option-letter { color: var(--wrong); }
+.rationale { background: var(--teal-pale); border-left: 3px solid var(--teal); padding: 16px 20px; border-radius: 0 6px 6px 0; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+.rationale strong { color: var(--navy); }
+.concept-pill { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.5px; background: var(--teal); color: white; padding: 3px 10px; border-radius: 100px; margin-bottom: 10px; text-transform: uppercase; }
+.others-list { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--ink-soft); }
+.others-list div { margin-bottom: 6px; }
+.btn-row { display: flex; gap: 12px; justify-content: flex-end; }
+.results-score { font-family: 'DM Serif Display', serif; font-size: 56px; text-align: center; margin: 12px 0; }
+.results-score.pass { color: var(--correct); }
+.results-score.borderline { color: var(--partial); }
+.results-score.fail { color: var(--wrong); }
+.results-pts { font-family: 'DM Mono', monospace; text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.perf-msg { text-align: center; margin: 16px 0 32px; font-size: 16px; color: var(--ink-soft); font-style: italic; }
+.missed-section h3 { font-family: 'DM Serif Display', serif; color: var(--navy); margin-bottom: 16px; font-size: 22px; }
+.missed-item { border: 1px solid var(--line); border-radius: 6px; padding: 16px; margin-bottom: 12px; background: var(--bg); font-size: 14px; }
+.missed-item .stem { font-weight: 500; margin-bottom: 8px; }
+.missed-item .ans { color: var(--correct); margin-bottom: 8px; font-family: 'DM Mono', monospace; font-size: 13px; }
+.missed-item .rat { color: var(--ink-soft); font-size: 13px; }
+.back-btn { position: fixed; bottom: 20px; left: 20px; background: var(--navy); color: white; text-decoration: none; padding: 10px 18px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 50; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-btn">← STUDY HUB</a>
+<div class="container">
+
+<div id="start-screen">
+  <div class="eyebrow">Knowledge Check · Chapter 20</div>
+  <h1>Chronic Pulmonary Disorders</h1>
+  <p class="tagline">Direct recall: emphysema, asthma, sleep apnea, oxygen delivery methods.</p>
+  <div class="start-card">
+    <div class="start-stats">
+      <div class="start-stat"><span class="start-stat-num">25</span><span class="start-stat-label">Questions</span></div>
+      <div class="start-stat"><span class="start-stat-num">MC</span><span class="start-stat-label">Format</span></div>
+      <div class="start-stat"><span class="start-stat-num">Yes</span><span class="start-stat-label">Rationale</span></div>
+    </div>
+    <p style="margin-bottom: 20px; color: var(--ink-soft);">Each question is direct recall from your review guides. Answer, get instant rationale, move on.</p>
+    <button class="btn" onclick="begin()">Begin</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="hidden">
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="question-card">
+    <div class="q-header">
+      <span id="q-counter">Question 1 of 25</span>
+      <span id="q-points">0 pts</span>
+    </div>
+    <div class="q-stem" id="q-stem"></div>
+    <div class="options" id="q-options"></div>
+    <div id="rationale-area" class="hidden"></div>
+    <div class="btn-row">
+      <button class="btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+      <button class="btn btn-secondary hidden" id="next-btn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div id="results-screen" class="hidden">
+  <div class="results-card">
+    <div class="eyebrow">Results · Knowledge Check</div>
+    <h1>Chronic Pulmonary</h1>
+    <div class="results-score" id="r-score">0%</div>
+    <div class="results-pts" id="r-pts">0 / 25 points</div>
+    <div class="perf-msg" id="r-msg"></div>
+    <div class="btn-row" style="justify-content: center; margin-bottom: 32px;">
+      <button class="btn" onclick="location.reload()">Retry Quiz</button>
+      <a href="index.html" class="btn btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center;">Back to Hub</a>
+    </div>
+    <div class="missed-section" id="missed-section"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'What is the underlying pathophysiology of emphysema?',
+    options: [
+      'Reversible airway inflammation triggered by allergens',
+      'Excessive thick mucus blocking the bronchi',
+      'Alveoli become overstretched and destroyed',
+      'Throat muscles relaxing and blocking airway'
+    ],
+    answer: 2,
+    concept: 'Emphysema Patho',
+    rationale: 'Emphysema is a disease of the alveoli (air sacs) where they become overstretched and eventually "pop" or get destroyed.',
+    others: {
+      0: 'Reversible airway inflammation describes asthma.',
+      1: 'Mucus overload describes chronic bronchitis.',
+      3: 'Throat muscle relaxation describes sleep apnea.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'A patient with emphysema is found to have polycythemia. What does this finding indicate?',
+    options: [
+      'The body is making extra RBCs to compensate for low oxygen',
+      'The patient has a bone marrow disorder requiring biopsy',
+      'The patient is overhydrated and needs diuresis',
+      'The patient has bacterial infection requiring antibiotics'
+    ],
+    answer: 0,
+    concept: 'Polycythemia Mechanism',
+    rationale: 'In emphysema, the body makes extra red blood cells to try to carry more oxygen since levels are low. This makes the blood thick.',
+    others: {
+      1: 'Polycythemia in this context is compensatory, not bone marrow disease.',
+      2: 'Polycythemia is RBC excess, not fluid overload.',
+      3: 'Polycythemia is unrelated to bacterial infection.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'A patient with emphysema develops peripheral edema. What is the underlying cause?',
+    options: [
+      'Acute kidney injury from medication',
+      'Hypothyroidism causing fluid retention',
+      'Hyperaldosteronism from adrenal disease',
+      'Right-sided HF (cor pulmonale) from lung disease'
+    ],
+    answer: 3,
+    concept: 'Cor Pulmonale',
+    rationale: 'Cor pulmonale is right-sided heart failure caused by lung disease. Peripheral edema (swelling in legs/ankles) is a classic sign.',
+    others: {
+      0: 'Pulmonary edema is the primary cause, not AKI.',
+      1: 'Hypothyroidism is unrelated.',
+      2: 'Hyperaldosteronism is not the cause in emphysema.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'Which physical findings are classic for emphysema?',
+    options: [
+      'Cyanotic appearance with peripheral edema',
+      'Wheezing triggered by cold air exposure',
+      'Productive cough lasting 3+ months yearly',
+      'Barrel chest and tripod positioning'
+    ],
+    answer: 3,
+    concept: 'Emphysema Appearance',
+    rationale: 'Barrel chest and tripod positioning are classic for emphysema patients ("pink puffers").',
+    others: {
+      0: 'Cyanosis with edema describes chronic bronchitis ("blue bloater").',
+      1: 'Wheezing triggered by cold air describes asthma.',
+      2: 'Productive cough 3+ months/year is the criterion for chronic bronchitis.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'What is the FIRST-line medication class for an asthma attack?',
+    options: [
+      'Long-acting corticosteroids (LABAs)',
+      'SABA (short-acting beta agonist) — albuterol',
+      'Oral antihistamines like diphenhydramine',
+      'IV antibiotics for bacterial coverage'
+    ],
+    answer: 1,
+    concept: 'Asthma First-Line',
+    rationale: 'Start with SABA (short-acting beta agonist) — albuterol — for an acute asthma attack.',
+    others: {
+      0: 'Long-acting agents are not for acute attacks; SABA is first-line rescue.',
+      2: 'Antihistamines do not reverse bronchospasm.',
+      3: 'Asthma is inflammatory, not bacterial.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'What is the most essential intervention for an asthma patient?',
+    options: [
+      'Daily inhaled corticosteroid use without regard to symptoms',
+      'Routine chest x-rays every 6 months',
+      'Annual influenza vaccination only',
+      'Teaching the patient to recognize and avoid triggers'
+    ],
+    answer: 3,
+    concept: 'Trigger Avoidance',
+    rationale: 'The essential intervention is to teach patients about recognizing and avoiding asthma triggers.',
+    others: {
+      0: 'Inhaled steroids are part of management but trigger avoidance is essential.',
+      1: 'Routine chest x-rays are not the most essential intervention.',
+      2: 'Vaccination is helpful but not the most essential daily intervention.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'How much fluid intake is recommended for chronic pulmonary patients to liquefy secretions?',
+    options: [
+      '2-3 L per day',
+      '0.5-1 L per day',
+      '1-2 L per day',
+      '4-5 L per day'
+    ],
+    answer: 0,
+    concept: 'Fluid Intake',
+    rationale: 'Encourage fluids 2-3 L per day to liquefy secretions, unless contraindicated.',
+    others: {
+      1: 'Too low — dehydrates and thickens mucus.',
+      2: 'Below the recommended range.',
+      3: 'Excessive and risks fluid overload, especially if cor pulmonale present.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'Which medication classes are first-line bronchodilators for chronic pulmonary disease?',
+    options: [
+      'Loop diuretics and ACE inhibitors',
+      'Beta-agonists and anticholinergics',
+      'Statins and aspirin',
+      'Antihistamines and decongestants'
+    ],
+    answer: 1,
+    concept: 'Bronchodilator Classes',
+    rationale: 'Bronchodilators are first-line: beta-agonists and anticholinergics. Corticosteroids reduce airway inflammation.',
+    others: {
+      0: 'These treat HF and HTN, not bronchoconstriction.',
+      2: 'Statins/aspirin are cardiovascular medications.',
+      3: 'Antihistamines/decongestants treat allergic rhinitis, not pulmonary disease.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'What dietary recommendation should the nurse give a patient with chronic pulmonary disease?',
+    options: [
+      'Three large meals daily for adequate calorie intake',
+      'High-fiber diet with raw bran cereal at every meal',
+      'Small, frequent, high-protein/high-calorie meals',
+      'Low-protein diet to reduce CO₂ production'
+    ],
+    answer: 2,
+    concept: 'Nutrition Strategy',
+    rationale: 'Provide small, frequent, high-protein/high-calorie meals. Avoid gas-forming foods that bloat and push against the diaphragm.',
+    others: {
+      0: 'Large meals worsen dyspnea by pushing against the diaphragm.',
+      1: 'Raw bran is gas-forming; fiber must be balanced.',
+      3: 'Low-protein worsens malnutrition; protein is essential.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'A nurse notes a patient with chronic pulmonary disease is becoming confused and irritable. What does the nurse suspect?',
+    options: [
+      'Normal aging changes — no intervention needed',
+      'Inadequate oxygenation or CO₂ retention',
+      'Side effect of bronchodilators only',
+      'Mild dehydration from fluid intake'
+    ],
+    answer: 1,
+    concept: 'Cognitive Changes',
+    rationale: 'Cognitive changes (changes in thinking or behavior) signal that the patient may not be getting enough oxygen or is retaining too much CO₂. Priority assessment.',
+    others: {
+      0: 'Cognitive changes are NEVER normal — they signal physiologic crisis.',
+      2: 'Bronchodilators may cause tremors, not confusion.',
+      3: 'Mild dehydration does not typically cause acute confusion.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'How is sleep apnea defined?',
+    options: [
+      'Stopping breathing ≥10 sec, ≥5x per hour',
+      'Snoring loudly for at least 30 minutes nightly without rest',
+      'Insomnia lasting more than 3 nights consecutively per week',
+      'Frequent awakening with night sweats and palpitations'
+    ],
+    answer: 0,
+    concept: 'Sleep Apnea Definition',
+    rationale: 'Apnea = stopping breathing for 10 seconds or longer. Sleep apnea is diagnosed when this happens at least 5 times every hour.',
+    others: {
+      1: 'Snoring alone is not the diagnostic definition.',
+      2: 'That describes insomnia, not apnea.',
+      3: 'Night sweats may have other causes.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'What is the #1 risk factor for sleep apnea?',
+    options: [
+      'Female sex over age 65',
+      'Family history of asthma',
+      'Cold weather exposure',
+      'Obesity'
+    ],
+    answer: 3,
+    concept: 'OSA Risk Factor',
+    rationale: 'Obesity is the #1 risk factor for sleep apnea. Extra fat around the neck crushes the airway.',
+    others: {
+      0: 'OSA affects all sexes; obesity matters more than sex/age.',
+      1: 'Asthma family history is for asthma, not OSA.',
+      2: 'Cold weather is unrelated.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'Which signs and symptoms are classic for sleep apnea?',
+    options: [
+      'Wheezing on exertion and chest tightness',
+      'Productive cough for months and cyanosis',
+      'Loud snoring with sudden silence and gasping',
+      'Chronic dry cough and hemoptysis'
+    ],
+    answer: 2,
+    concept: 'OSA Symptoms',
+    rationale: 'Sleep apnea presents with loud snoring followed by sudden silence (apnea), gasping/snorting awakenings, daytime sleepiness, and morning headaches.',
+    others: {
+      0: 'Wheezing and chest tightness describe asthma.',
+      1: 'Productive cough and cyanosis describe chronic bronchitis.',
+      3: 'Chronic dry cough with hemoptysis suggests other lung diseases.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'A patient with sleep apnea reports waking with morning headaches. What is the underlying cause?',
+    options: [
+      'Caffeine withdrawal during sleep',
+      'Low oxygen during the night',
+      'High blood pressure spikes only during sleep',
+      'Dehydration from snoring'
+    ],
+    answer: 1,
+    concept: 'Morning Headache Cause',
+    rationale: 'Morning headaches in sleep apnea are caused by low oxygen during the night.',
+    others: {
+      0: 'Caffeine withdrawal does not match this clinical pattern.',
+      2: 'BP changes do not directly cause this headache pattern.',
+      3: 'Snoring alone does not cause clinically significant dehydration.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'What is the gold-standard diagnostic test for sleep apnea?',
+    options: [
+      'Sleep study (polysomnography)',
+      'Chest x-ray with lateral view',
+      'Pulmonary function tests (PFTs)',
+      'Arterial blood gas analysis'
+    ],
+    answer: 0,
+    concept: 'Gold Standard Diagnostic',
+    rationale: 'Sleep study (polysomnography) is the gold standard. The patient stays overnight while machines monitor heart, breathing, and brain waves.',
+    others: {
+      1: 'Chest x-ray does not diagnose sleep apnea.',
+      2: 'PFTs assess obstructive/restrictive lung disease, not apnea.',
+      3: 'ABG can show hypoxia but does not diagnose sleep apnea.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'What is the first-line treatment for sleep apnea?',
+    options: [
+      'Surgical removal of the tonsils',
+      'Daily oral corticosteroids',
+      'CPAP (continuous positive airway pressure)',
+      'Nasal cannula at low-flow only'
+    ],
+    answer: 2,
+    concept: 'OSA First-Line',
+    rationale: 'CPAP is the first-line treatment for sleep apnea. The mask blows a constant stream of air to prop the airway open.',
+    others: {
+      0: 'Surgery is not first-line; CPAP is.',
+      1: 'Oral steroids are not first-line for apnea.',
+      3: 'Nasal cannula does not prop open the airway during sleep.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'How does BiPAP differ from CPAP?',
+    options: [
+      'BiPAP uses different pressures for inhalation and exhalation',
+      'BiPAP delivers oxygen-only without positive pressure',
+      'BiPAP is used only during waking hours',
+      'BiPAP requires a tracheostomy for use'
+    ],
+    answer: 0,
+    concept: 'BiPAP vs CPAP',
+    rationale: 'BiPAP (bilevel positive airway pressure) uses different pressures for inhalation and exhalation. CPAP delivers a single constant pressure.',
+    others: {
+      1: 'BiPAP delivers positive pressure, not just oxygen.',
+      2: 'BiPAP is also used during sleep.',
+      3: 'BiPAP uses a mask, not a tracheostomy.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'Which patient education is appropriate for a patient with sleep apnea?',
+    options: [
+      'Sleep on your back to keep the airway aligned',
+      'Drink alcohol before bed to relax muscles',
+      'Lose weight, avoid alcohol before bed, sleep on side',
+      'Avoid CPAP use to prevent dependence'
+    ],
+    answer: 2,
+    concept: 'OSA Education',
+    rationale: 'Tell sleep apnea patients to lose weight, avoid alcohol before bed, and sleep on their side (not their back).',
+    others: {
+      0: 'Sleeping on the back collapses the airway in OSA.',
+      1: 'Alcohol relaxes throat muscles and worsens apnea.',
+      3: 'CPAP is the first-line treatment; consistent use is essential.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'What is the standard flow rate range for a nasal cannula?',
+    options: [
+      '0.25-0.5 L/min',
+      '8-15 L/min',
+      '15-30 L/min',
+      '1-6 L/min'
+    ],
+    answer: 3,
+    concept: 'Nasal Cannula Flow',
+    rationale: 'Nasal cannula delivers 1-6 L/min. Add humidification if ≥4 L/min to prevent mucosal drying.',
+    others: {
+      0: 'Below the typical clinical range.',
+      1: '8-15 L/min would be a high-flow nasal cannula or non-rebreather.',
+      2: 'Far exceeds nasal cannula capability.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'When should humidification be added to nasal cannula oxygen?',
+    options: [
+      'Always, regardless of flow rate',
+      'Only at flow rates of 4 L/min or higher',
+      'Only when the patient requests it',
+      'Never — humidification damages the cannula'
+    ],
+    answer: 1,
+    concept: 'Humidification',
+    rationale: 'Add humidification at flow rates ≥4 L/min to prevent mucosal drying.',
+    others: {
+      0: 'Low flow rates do not require humidification.',
+      2: 'It is based on flow rate, not patient preference.',
+      3: 'Humidification is appropriate when indicated.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'What is the flow rate range for a simple face mask?',
+    options: [
+      '1-3 L/min',
+      '4-6 L/min',
+      '5-8 L/min',
+      '12-15 L/min'
+    ],
+    answer: 2,
+    concept: 'Simple Face Mask Flow',
+    rationale: 'Simple face mask delivers 5-8 L/min. It covers the nose and mouth and must be removed to eat.',
+    others: {
+      0: 'Below the simple face mask minimum (causes CO₂ rebreathing).',
+      1: 'Below the typical mask range.',
+      3: 'Higher rates require a non-rebreather mask.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'What practical limitation does a simple face mask have during meals?',
+    options: [
+      'It must be removed to eat',
+      'It cannot be used with humidification',
+      'It only works during sleep',
+      'It blocks vision while reading'
+    ],
+    answer: 0,
+    concept: 'Mask Limitation',
+    rationale: 'A simple face mask covers the nose/mouth and must be removed to eat. Switch to nasal cannula during meals.',
+    others: {
+      1: 'Humidification is compatible.',
+      2: 'It is used during waking hours as needed.',
+      3: 'Vision is not the primary limitation.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'How does CPAP keep the airway open?',
+    options: [
+      'Pulsed oxygen delivered every 5 seconds',
+      'Bilevel pressure adjusted to breathing',
+      'Negative pressure pulling air outward',
+      'A single constant pressure delivered continuously'
+    ],
+    answer: 3,
+    concept: 'CPAP Mechanism',
+    rationale: 'CPAP delivers continuous positive airway pressure — a single constant pressure that keeps airways open.',
+    others: {
+      0: 'CPAP is continuous, not pulsed.',
+      1: 'That describes BiPAP.',
+      2: 'CPAP uses positive pressure, not negative.'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'A patient diagnosed with severe asthma is also receiving inhaled corticosteroids. What is the primary purpose of corticosteroids?',
+    options: [
+      'Stimulate mucus production for clearance',
+      'Reduce airway inflammation',
+      'Constrict bronchi to slow respirations',
+      'Prevent fungal infections of the lungs'
+    ],
+    answer: 1,
+    concept: 'Corticosteroid Purpose',
+    rationale: 'Inhaled corticosteroids reduce airway inflammation in asthma and chronic pulmonary disease.',
+    others: {
+      0: 'Corticosteroids do not stimulate mucus.',
+      2: 'Corticosteroids do not bronchoconstrict.',
+      3: 'Corticosteroids actually increase fungal infection risk (e.g., oral thrush).'
+    }
+  },
+  {
+    topic: 'ChronicPulm',
+    type: 'standard',
+    stem: 'Which intervention helps clear airway secretions in chronic pulmonary patients?',
+    options: [
+      'Limit fluids to less than 1 L/day',
+      'Avoid all coughing to prevent strain',
+      'Use nasal cannula on lowest setting only',
+      'Chest physiotherapy (CPT) and postural drainage'
+    ],
+    answer: 3,
+    concept: 'Airway Clearance',
+    rationale: 'Chest physiotherapy (CPT) and postural drainage help clear secretions. Combined with hydration (2-3 L/day) to liquefy mucus.',
+    others: {
+      0: 'Fluid restriction worsens secretion thickness.',
+      1: 'Coughing is needed to clear secretions.',
+      2: 'Oxygen flow rate does not directly clear secretions.'
+    }
+  }
+];
+
+// === QUIZ ENGINE ===
+let currentQ = 0;
+let totalPts = 0;
+let answers = [];
+let selectedOption = null;
+
+function begin() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  selectedOption = null;
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+  document.getElementById('progress').style.width = `${(currentQ / questions.length) * 100}%`;
+  document.getElementById('q-stem').textContent = q.stem;
+  const optsHtml = q.options.map((opt, i) => `
+    <div class="option" data-idx="${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${String.fromCharCode(65+i)}.</span>
+      <span>${opt}</span>
+    </div>
+  `).join('');
+  document.getElementById('q-options').innerHTML = optsHtml;
+  document.getElementById('rationale-area').classList.add('hidden');
+  document.getElementById('rationale-area').innerHTML = '';
+  document.getElementById('submit-btn').classList.remove('hidden');
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('next-btn').classList.add('hidden');
+}
+
+function selectOption(idx) {
+  selectedOption = idx;
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.option[data-idx="${idx}"]`).classList.add('selected');
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+  const q = questions[currentQ];
+  const correct = q.answer;
+  const isCorrect = selectedOption === correct;
+  const pts = isCorrect ? 1 : 0;
+  totalPts += pts;
+  answers.push({ q, selected: selectedOption, correct, pts });
+
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.add('locked');
+    el.onclick = null;
+    if (i === correct) el.classList.add('correct');
+    else if (i === selectedOption) el.classList.add('wrong');
+  });
+
+  let othersHtml = '';
+  if (q.others) {
+    othersHtml = '<div class="others-list">';
+    Object.keys(q.others).forEach(k => {
+      othersHtml += `<div><strong>${String.fromCharCode(65+parseInt(k))}.</strong> ${q.others[k]}</div>`;
+    });
+    othersHtml += '</div>';
+  }
+
+  const ratHtml = `
+    <div class="rationale">
+      <span class="concept-pill">${q.concept}</span>
+      <div><strong>${isCorrect ? 'Correct.' : 'Incorrect.'}</strong> ${q.rationale}</div>
+      ${q.deepExplanation ? `<div style="margin-top:8px; color: var(--ink-soft);">${q.deepExplanation}</div>` : ''}
+      ${othersHtml}
+    </div>
+  `;
+  const rArea = document.getElementById('rationale-area');
+  rArea.innerHTML = ratHtml;
+  rArea.classList.remove('hidden');
+  document.getElementById('submit-btn').classList.add('hidden');
+  document.getElementById('next-btn').classList.remove('hidden');
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) showResults();
+  else renderQuestion();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  const pct = (totalPts / questions.length) * 100;
+  const scoreEl = document.getElementById('r-score');
+  scoreEl.textContent = `${pct.toFixed(0)}%`;
+  if (pct >= 85) scoreEl.classList.add('pass');
+  else if (pct >= 70) scoreEl.classList.add('borderline');
+  else scoreEl.classList.add('fail');
+  document.getElementById('r-pts').textContent = `${totalPts.toFixed(1)} / ${questions.length} points`;
+
+  let msg = '';
+  if (pct >= 90) msg = 'Excellent recall — you know this chapter cold.';
+  else if (pct >= 77) msg = 'Passing — keep reviewing the missed concepts.';
+  else if (pct >= 60) msg = 'Below passing — focus on the missed concepts before the exam.';
+  else msg = 'This chapter needs more review. Re-read the source guide and retake.';
+  document.getElementById('r-msg').textContent = msg;
+
+  const missed = answers.filter(a => a.pts < 1);
+  if (missed.length > 0) {
+    let html = '<h3>Missed Concepts</h3>';
+    missed.forEach(m => {
+      html += `<div class="missed-item">
+        <div class="stem">${m.q.stem}</div>
+        <div class="ans">Correct: ${String.fromCharCode(65+m.correct)}. ${m.q.options[m.correct]}</div>
+        <div class="rat">${m.q.rationale}</div>
+      </div>`;
+    });
+    document.getElementById('missed-section').innerHTML = html;
+  }
+
+  const result = {
+    pct: parseFloat(pct.toFixed(1)),
+    pts: parseFloat(totalPts.toFixed(1)),
+    total: questions.length,
+    date: new Date().toISOString().split('T')[0]
+  };
+  localStorage.setItem('score_chronicpulm_knowledge', JSON.stringify(result));
+}
+</script>
+</body>
+</html>

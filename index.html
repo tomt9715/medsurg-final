@@ -102,25 +102,41 @@ h1 { font-family: 'DM Serif Display', serif; font-size: 42px; color: var(--navy)
 .topic-weight-badge { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink-soft); background: var(--bg); padding: 4px 8px; border-radius: 4px; text-align: center; letter-spacing: 0.3px; }
 .topic-weight-badge.high { background: var(--gold-pale); color: #92400e; }
 
-.quiz-cell { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; text-decoration: none; color: var(--ink); border: 1px solid var(--line); transition: all 0.15s; min-width: 0; }
-.quiz-cell:hover { border-color: var(--teal); background: var(--teal-pale); }
-.quiz-cell.dd:hover { border-color: var(--purple); background: var(--purple-pale); }
-.quiz-cell.coming-soon { background: var(--bg); border-style: dashed; cursor: not-allowed; opacity: 0.6; }
-.quiz-cell.coming-soon:hover { background: var(--bg); border-color: var(--line); }
-.quiz-cell-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); flex-shrink: 0; min-width: 22px; }
-.quiz-cell-label.kc { color: var(--teal); font-weight: 500; }
-.quiz-cell-label.dd { color: var(--purple); font-weight: 500; }
-.quiz-cell-score { font-family: 'DM Serif Display', serif; font-size: 18px; line-height: 1; flex-shrink: 0; min-width: 36px; }
+.quiz-cell { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; text-decoration: none; color: var(--ink); border: 1.5px solid var(--line); transition: all 0.15s; min-width: 0; background: var(--card); position: relative; }
+.quiz-cell.kc { border-color: #99f6e4; }
+.quiz-cell.dd { border-color: #ddd6fe; }
+.quiz-cell.kc:hover { border-color: var(--teal); background: var(--teal-pale); transform: translateY(-1px); box-shadow: 0 2px 6px rgba(13, 148, 136, 0.15); }
+.quiz-cell.dd:hover { border-color: var(--purple); background: var(--purple-pale); transform: translateY(-1px); box-shadow: 0 2px 6px rgba(124, 58, 237, 0.15); }
+.quiz-cell.no-score.kc { background: var(--teal-pale); }
+.quiz-cell.no-score.dd { background: var(--purple-pale); }
+.quiz-cell.coming-soon { background: repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(0,0,0,0.025) 6px, rgba(0,0,0,0.025) 12px), var(--bg); border: 1.5px dashed var(--line); cursor: not-allowed; opacity: 0.55; filter: grayscale(0.5); }
+.quiz-cell.coming-soon:hover { background: repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(0,0,0,0.025) 6px, rgba(0,0,0,0.025) 12px), var(--bg); border-color: var(--line); transform: none; box-shadow: none; }
+.quiz-cell-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; flex-shrink: 0; min-width: 22px; font-weight: 600; }
+.quiz-cell-label.kc { color: var(--teal); }
+.quiz-cell-label.dd { color: var(--purple); }
+.quiz-cell.coming-soon .quiz-cell-label { color: var(--muted-soft); font-weight: 400; }
+.quiz-cell-score { font-family: 'DM Serif Display', serif; font-size: 20px; line-height: 1; flex-shrink: 0; min-width: 36px; }
 .quiz-cell-score.pass { color: var(--pass); }
 .quiz-cell-score.partial { color: var(--partial); }
 .quiz-cell-score.fail { color: var(--fail); }
-.quiz-cell-score.none { color: var(--muted-soft); font-size: 11px; font-family: 'Outfit', sans-serif; font-style: italic; min-width: auto; }
+.quiz-cell-score.start { color: var(--ink); font-size: 12px; font-family: 'DM Mono', monospace; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; min-width: auto; }
+.quiz-cell.kc .quiz-cell-score.start { color: var(--teal); }
+.quiz-cell.dd .quiz-cell-score.start { color: var(--purple); }
+.quiz-cell-score.soon { color: var(--muted-soft); font-size: 10px; font-family: 'DM Mono', monospace; font-style: normal; letter-spacing: 0.5px; text-transform: uppercase; min-width: auto; }
 .score-bar { flex: 1; height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; min-width: 30px; }
 .score-bar-fill { height: 100%; transition: width 0.4s; }
 .score-bar-fill.pass { background: var(--pass); }
 .score-bar-fill.partial { background: var(--partial); }
 .score-bar-fill.fail { background: var(--fail); }
+.score-bar-fill.start.kc { background: var(--teal); width: 0; opacity: 0.3; animation: pulse-bar 2s ease-in-out infinite; }
+.score-bar-fill.start.dd { background: var(--purple); width: 0; opacity: 0.3; animation: pulse-bar 2s ease-in-out infinite; }
 .score-bar-fill.none { width: 0; }
+@keyframes pulse-bar { 0%, 100% { width: 8%; } 50% { width: 24%; } }
+.cta-arrow { color: var(--muted-soft); font-size: 14px; margin-left: auto; padding-left: 4px; transition: transform 0.15s; }
+.quiz-cell:hover .cta-arrow { transform: translateX(3px); }
+.quiz-cell.kc:hover .cta-arrow { color: var(--teal); }
+.quiz-cell.dd:hover .cta-arrow { color: var(--purple); }
+.quiz-cell.coming-soon .cta-arrow { display: none; }
 
 .footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
 .legend { display: flex; gap: 14px; flex-wrap: wrap; }
@@ -234,7 +250,7 @@ const topics = [
   { ch: '26', name: 'Vascular Disorders', desc: 'Raynaud, PE, DVT, venous vs arterial', weight: 5, key: 'vascular', system: 'cardio', kcFile: 'ch26_vascular_kc.html', ddFile: 'ch26_vascular_dd.html', kcReady: false, ddReady: false },
   { ch: '27', name: 'Hypertension', desc: 'Long-term complications, DASH diet', weight: 3, key: 'hypertension', system: 'cardio', kcFile: 'ch27_hypertension_kc.html', ddFile: 'ch27_hypertension_dd.html', kcReady: false, ddReady: false },
   { ch: '18', name: 'Upper Respiratory', desc: 'Acute vs chronic bronchitis', weight: 2, key: 'upperresp', system: 'pulm', kcFile: 'ch18_upperresp_kc.html', ddFile: 'ch18_upperresp_dd.html', kcReady: true, ddReady: true },
-  { ch: '20', name: 'Chronic Pulmonary', desc: 'Emphysema, asthma, sleep apnea, O₂ delivery', weight: 6, key: 'chronicpulm', system: 'pulm', kcFile: 'ch20_chronicpulm_kc.html', ddFile: 'ch20_chronicpulm_dd.html', kcReady: false, ddReady: false },
+  { ch: '20', name: 'Chronic Pulmonary', desc: 'Emphysema, asthma, sleep apnea, O₂ delivery', weight: 6, key: 'chronicpulm', system: 'pulm', kcFile: 'ch20_chronicpulm_kc.html', ddFile: 'ch20_chronicpulm_dd.html', kcReady: true, ddReady: false },
   { ch: '29', name: 'Nonmalignant Hematologic', desc: 'Thrombocytopenia, leukopenia, anemias, sickle cell', weight: 5, key: 'nonmalighem', system: 'hem', kcFile: 'ch29_nonmalighem_kc.html', ddFile: 'ch29_nonmalighem_dd.html', kcReady: false, ddReady: false },
   { ch: '30', name: 'Hematologic Disorders', desc: 'Polycythemia vera, leukemias (AML/CML/ALL/CLL)', weight: 3, key: 'hematdisorders', system: 'hem', kcFile: 'ch30_hematdisorders_kc.html', ddFile: 'ch30_hematdisorders_dd.html', kcReady: false, ddReady: false },
   { ch: '12', name: 'Oncology', desc: 'Chemo, neutropenia, radiation, CBC monitoring', weight: 6, key: 'oncology', system: 'oncoimmune', kcFile: 'ch12_oncology_kc.html', ddFile: 'ch12_oncology_dd.html', kcReady: true, ddReady: true },
@@ -291,17 +307,17 @@ function renderQuizCell(topic, type) {
   if (!ready) {
     return `<div class="quiz-cell coming-soon">
       <span class="quiz-cell-label ${labelClass}">${labelText}</span>
-      <span class="quiz-cell-score none">Soon</span>
-      <div class="score-bar"><div class="score-bar-fill none"></div></div>
+      <span class="quiz-cell-score soon">Coming soon</span>
     </div>`;
   }
 
   const score = getScore(topic.key, scoreKey);
   if (!score) {
-    return `<a href="${file}" class="quiz-cell ${labelClass}">
+    return `<a href="${file}" class="quiz-cell ${labelClass} no-score">
       <span class="quiz-cell-label ${labelClass}">${labelText}</span>
-      <span class="quiz-cell-score none">Start</span>
-      <div class="score-bar"><div class="score-bar-fill none"></div></div>
+      <span class="quiz-cell-score start">Start</span>
+      <div class="score-bar"><div class="score-bar-fill start ${labelClass}"></div></div>
+      <span class="cta-arrow">→</span>
     </a>`;
   }
 
@@ -310,6 +326,7 @@ function renderQuizCell(topic, type) {
     <span class="quiz-cell-label ${labelClass}">${labelText}</span>
     <span class="quiz-cell-score ${cls}">${score.pct.toFixed(0)}</span>
     <div class="score-bar"><div class="score-bar-fill ${cls}" style="width: ${score.pct}%;"></div></div>
+    <span class="cta-arrow">→</span>
   </a>`;
 }
 
