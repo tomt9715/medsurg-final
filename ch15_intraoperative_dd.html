@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch 15 Intraoperative — Deep Drill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a2540;
+  --navy-soft: #1a3a5c;
+  --teal: #0d9488;
+  --teal-pale: #f0fdfa;
+  --purple: #7c3aed;
+  --purple-pale: #f5f3ff;
+  --gold: #f59e0b;
+  --ink: #1a1a1a;
+  --ink-soft: #3a3a3a;
+  --muted: #6b7280;
+  --bg: #fafaf7;
+  --card: #ffffff;
+  --line: #e5e0d5;
+  --correct: #059669;
+  --correct-bg: #ecfdf5;
+  --wrong: #dc2626;
+  --wrong-bg: #fef2f2;
+  --partial: #d97706;
+  --partial-bg: #fffbeb;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; padding: 32px 16px 80px; min-height: 100vh; }
+.container { max-width: 760px; margin: 0 auto; }
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--purple); text-transform: uppercase; margin-bottom: 12px; }
+h1 { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--navy); margin-bottom: 8px; line-height: 1.15; }
+.tagline { color: var(--muted); margin-bottom: 32px; font-size: 16px; }
+.start-card, .question-card, .results-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 32px; margin-bottom: 24px; }
+.start-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+.start-stat { border: 1px solid var(--line); border-radius: 4px; padding: 16px; text-align: center; }
+.start-stat-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--purple); display: block; }
+.start-stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+.btn { background: var(--purple); color: white; border: none; padding: 14px 32px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.btn:hover { background: #6d28d9; }
+.btn:disabled { background: var(--muted); cursor: not-allowed; }
+.btn-secondary { background: var(--navy); }
+.btn-secondary:hover { background: var(--navy-soft); }
+.progress-bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 24px; }
+.progress-fill { height: 100%; background: var(--purple); transition: width 0.3s; }
+.q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+.q-stem { font-size: 18px; color: var(--ink); margin-bottom: 24px; line-height: 1.5; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.option { border: 1.5px solid var(--line); border-radius: 6px; padding: 14px 18px; cursor: pointer; transition: all 0.15s; background: var(--card); font-size: 15px; display: flex; align-items: flex-start; gap: 12px; }
+.option:hover:not(.locked) { border-color: var(--purple); background: var(--purple-pale); }
+.option.selected { border-color: var(--purple); background: var(--purple-pale); }
+.option.correct { border-color: var(--correct); background: var(--correct-bg); }
+.option.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+.option-letter { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--muted); min-width: 18px; }
+.option.correct .option-letter { color: var(--correct); }
+.option.wrong .option-letter { color: var(--wrong); }
+.rationale { background: var(--purple-pale); border-left: 3px solid var(--purple); padding: 16px 20px; border-radius: 0 6px 6px 0; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+.rationale strong { color: var(--navy); }
+.concept-pill { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.5px; background: var(--purple); color: white; padding: 3px 10px; border-radius: 100px; margin-bottom: 10px; text-transform: uppercase; }
+.others-list { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--ink-soft); }
+.others-list div { margin-bottom: 6px; }
+.btn-row { display: flex; gap: 12px; justify-content: flex-end; }
+.results-score { font-family: 'DM Serif Display', serif; font-size: 56px; text-align: center; margin: 12px 0; }
+.results-score.pass { color: var(--correct); }
+.results-score.borderline { color: var(--partial); }
+.results-score.fail { color: var(--wrong); }
+.results-pts { font-family: 'DM Mono', monospace; text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.perf-msg { text-align: center; margin: 16px 0 32px; font-size: 16px; color: var(--ink-soft); font-style: italic; }
+.missed-section h3 { font-family: 'DM Serif Display', serif; color: var(--navy); margin-bottom: 16px; font-size: 22px; }
+.missed-item { border: 1px solid var(--line); border-radius: 6px; padding: 16px; margin-bottom: 12px; background: var(--bg); font-size: 14px; }
+.missed-item .stem { font-weight: 500; margin-bottom: 8px; }
+.missed-item .ans { color: var(--correct); margin-bottom: 8px; font-family: 'DM Mono', monospace; font-size: 13px; }
+.missed-item .rat { color: var(--ink-soft); font-size: 13px; }
+.back-btn { position: fixed; bottom: 20px; left: 20px; background: var(--navy); color: white; text-decoration: none; padding: 10px 18px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 50; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-btn">← STUDY HUB</a>
+<div class="container">
+
+<div id="start-screen">
+  <div class="eyebrow">Deep Drill · Chapter 15</div>
+  <h1>Intraoperative Nursing</h1>
+  <p class="tagline">NCLEX-style application: MH crisis recognition, zone violations, sterile field judgment, OR safety priorities.</p>
+  <div class="start-card">
+    <div class="start-stats">
+      <div class="start-stat"><span class="start-stat-num">25</span><span class="start-stat-label">Questions</span></div>
+      <div class="start-stat"><span class="start-stat-num">MC</span><span class="start-stat-label">Format</span></div>
+      <div class="start-stat"><span class="start-stat-num">Yes</span><span class="start-stat-label">Rationale</span></div>
+    </div>
+    <p style="margin-bottom: 20px; color: var(--ink-soft);">Higher-difficulty NCLEX-style scenarios. Apply your knowledge to priority and clinical-judgment situations.</p>
+    <button class="btn" onclick="begin()">Begin</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="hidden">
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="question-card">
+    <div class="q-header">
+      <span id="q-counter">Question 1 of 25</span>
+      <span id="q-points">0 pts</span>
+    </div>
+    <div class="q-stem" id="q-stem"></div>
+    <div class="options" id="q-options"></div>
+    <div id="rationale-area" class="hidden"></div>
+    <div class="btn-row">
+      <button class="btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+      <button class="btn btn-secondary hidden" id="next-btn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div id="results-screen" class="hidden">
+  <div class="results-card">
+    <div class="eyebrow">Results · Deep Drill</div>
+    <h1>Intraoperative</h1>
+    <div class="results-score" id="r-score">0%</div>
+    <div class="results-pts" id="r-pts">0 / 25 points</div>
+    <div class="perf-msg" id="r-msg"></div>
+    <div class="btn-row" style="justify-content: center; margin-bottom: 32px;">
+      <button class="btn" onclick="location.reload()">Retry Quiz</button>
+      <a href="index.html" class="btn btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center;">Back to Hub</a>
+    </div>
+    <div class="missed-section" id="missed-section"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A patient is 15 minutes into general anesthesia when the nurse notices HR 158, jaw rigidity, and rising end-tidal CO₂. What is the priority action?',
+    options: [
+      'Administer additional anesthetic to deepen sedation',
+      'Apply warming blankets to maintain body temperature',
+      'Increase IV fluid rate and continue monitoring',
+      'Communicate to the surgical team to stop anesthesia'
+    ],
+    answer: 3,
+    concept: 'MH Crisis Recognition',
+    rationale: 'These are early signs of malignant hyperthermia at the typical 10-20 minute onset window. Priority is to communicate to the surgical team immediately so anesthesia can be discontinued and dantrolene given.',
+    others: {
+      0: 'Additional anesthetic worsens MH — anesthetics are the trigger.',
+      1: 'Warming worsens MH; cooling is needed.',
+      2: 'Monitoring alone is inadequate for an emergency.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A new graduate nurse asks why street clothes are not allowed in the semi-restricted zone. What is the best response?',
+    options: [
+      '"Street clothes carry pathogens; this zone requires scrub clothes and caps."',
+      '"Hospital policy requires scrubs everywhere for billing reasons."',
+      '"Street clothes are fine if you wear a gown over them."',
+      '"You only need to change for the restricted zone, not semi-restricted."'
+    ],
+    answer: 0,
+    concept: 'Zone Education',
+    rationale: 'Semi-restricted zone requires scrub clothes and caps because street clothes carry environmental pathogens. Each zone progressively reduces contamination.',
+    others: {
+      1: 'It\'s a clinical infection prevention measure, not for billing.',
+      2: 'A gown over street clothes is not the protocol.',
+      3: 'Both semi-restricted AND restricted zones require attire changes.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'During surgery the patient\'s temperature rises rapidly from 99°F to 104°F. Which interpretation is most accurate?',
+    options: [
+      'This is an early sign of malignant hyperthermia',
+      'This is a late sign of malignant hyperthermia and indicates advanced crisis',
+      'This indicates infection and warrants antibiotic administration',
+      'This indicates the room is too warm and the thermostat must be adjusted'
+    ],
+    answer: 1,
+    concept: 'Late Sign Recognition',
+    rationale: 'Rapid temperature rise is the LATE sign of MH. By this point, the crisis is advanced and aggressive cooling, dantrolene, and acidosis correction are required.',
+    others: {
+      0: 'Temperature rise is LATE, not early. Earlier signs include tachycardia and jaw rigidity.',
+      2: 'Surgical infections do not cause this rapid intraoperative spike.',
+      3: 'A 5°F rise during surgery is not from room temperature.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A patient with a known family history of malignant hyperthermia is scheduled for surgery. Which preoperative finding is most important?',
+    options: [
+      'Confirmation that an MH-specific cart is available in the OR',
+      'The patient\'s preferred music for the OR',
+      'The patient\'s usual blood pressure trend',
+      'The patient\'s preferred lunch order for post-op'
+    ],
+    answer: 0,
+    concept: 'MH Preparedness',
+    rationale: 'For a patient with known MH risk, confirming the MH-specific cart is available is critical. The cart contains dantrolene and supplies needed if a crisis occurs.',
+    others: {
+      1: 'Music is a comfort measure, not a safety priority.',
+      2: 'BP trend is helpful but secondary to MH preparedness.',
+      3: 'Lunch orders are not relevant to intraoperative safety.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A circulating nurse observes the scrub nurse\'s sterile gloved hand drop below waist level briefly. What is the appropriate action?',
+    options: [
+      'No action needed if the hand was not visibly contaminated',
+      'Document the event but allow the scrub nurse to continue',
+      'Treat the gloved hand as contaminated and replace gloves',
+      'Wipe the gloves with alcohol pads to restore sterility'
+    ],
+    answer: 2,
+    concept: 'Sterile Field Integrity',
+    rationale: 'In strict surgical asepsis, anything below waist level is considered non-sterile. The gloves must be treated as contaminated and replaced to maintain sterile field integrity.',
+    others: {
+      0: 'Visible contamination is not the only criterion — the field is broken if the hand drops below waist level.',
+      1: 'Documentation alone allows continued contamination risk.',
+      3: 'Alcohol does not restore sterility once a field is broken.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A patient is being prepped for surgery. The nurse instructs the patient to perform additional skin cleansing in the preoperative area using:',
+    options: [
+      'Hydrogen peroxide on a cotton ball',
+      'Plain soap and water',
+      'Chlorhexidine wipes',
+      'Iodine-based ointment'
+    ],
+    answer: 2,
+    concept: 'Chlorhexidine Application',
+    rationale: 'Additional body cleansing with chlorhexidine wipes occurs in the preoperative area, performed by the nurse or by the patient under the nurse\'s direction.',
+    others: {
+      0: 'Hydrogen peroxide is not the standard preoperative antimicrobial.',
+      1: 'Plain soap lacks antimicrobial properties needed.',
+      3: 'Iodine ointment is not used for general preoperative skin cleansing.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'During surgery the patient develops HR 165 and jaw rigidity. The anesthesiologist administers IV dantrolene. The nurse anticipates which additional supportive interventions?',
+    options: [
+      'Warming blankets and increased anesthetic dose',
+      'Oxygen, cooling measures, and correction of acidosis',
+      'Beta-blocker administration and elevation of the head of bed',
+      'Restricting fluids and applying positive pressure ventilation only'
+    ],
+    answer: 1,
+    concept: 'MH Bundle Care',
+    rationale: 'In addition to dantrolene, treatment goals include oxygen, cooling, correction of metabolic and respiratory acidosis, and correcting dysrhythmias and electrolyte imbalances.',
+    others: {
+      0: 'Warming worsens MH; anesthesia must be STOPPED.',
+      2: 'Beta-blockers are not the standard MH intervention.',
+      3: 'Fluid restriction is harmful in MH; aggressive cooling and electrolyte management are needed.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A patient asks why she is being told to bathe with antimicrobial soap the night before surgery. What is the best nursing response?',
+    options: [
+      '"It helps you smell pleasant for the surgical team."',
+      '"It washes off body lotions that interfere with anesthesia."',
+      '"It reduces skin bacteria and helps prevent surgical site infection."',
+      '"Insurance requires documentation of preoperative bathing."'
+    ],
+    answer: 2,
+    concept: 'Preop Bath Rationale',
+    rationale: 'Preoperative bathing the night before surgery with antimicrobial soap reduces skin flora and is a key infection prevention strategy.',
+    others: {
+      0: 'Smell is not the clinical reason.',
+      1: 'Lotions are addressed separately; this is about reducing pathogens.',
+      3: 'Insurance documentation is not the rationale for the practice.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which finding during surgery should the nurse report immediately to the anesthesiologist?',
+    options: [
+      'Patient HR 78, BP 118/76, ETCO₂ 38 mmHg',
+      'Patient temperature 98.4°F with O₂ sat 99%',
+      'Patient skin warm and dry with regular respirations',
+      'Patient HR 156 with sudden masseter muscle rigidity'
+    ],
+    answer: 3,
+    concept: 'Reportable MH Signs',
+    rationale: 'HR 156 with masseter (jaw) rigidity is a classic early MH presentation. Report immediately so anesthesia can be stopped and treatment initiated.',
+    others: {
+      0: 'These are normal vital signs.',
+      1: 'These are normal findings.',
+      2: 'Warm, dry skin with regular respirations is normal.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A patient with known MH is scheduled for surgery. Which question is most important during the preoperative interview?',
+    options: [
+      'Any family history of anesthesia complications or MH?',
+      'Are you allergic to penicillin or sulfa-based antibiotics?',
+      'Have you had previous surgery before with no problems?',
+      'What is your favorite type of comfort food at home?'
+    ],
+    answer: 0,
+    concept: 'Family History Screening',
+    rationale: 'MH is inherited, so family history of anesthesia complications is critical preoperative information that affects anesthetic selection.',
+    others: {
+      1: 'Penicillin allergy is important but not specific to MH.',
+      2: 'Past uneventful surgery does not rule out MH.',
+      3: 'Food preferences are not relevant to MH risk.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'The nurse delegates a task to the circulating nurse. Which task is appropriate?',
+    options: [
+      'Handing sterile instruments to the surgeon',
+      'Performing the surgical incision',
+      'Inducing general anesthesia',
+      'Conducting the instrument count'
+    ],
+    answer: 3,
+    concept: 'Circulating Tasks',
+    rationale: 'Conducting the instrument count is a circulating nurse responsibility — they operate in the non-sterile field managing supplies and documentation.',
+    others: {
+      0: 'Handing sterile instruments is the scrub nurse role.',
+      1: 'Only the surgeon performs incisions.',
+      2: 'Anesthesia induction is performed by the anesthesia provider.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A nurse enters the OR wearing scrubs and a cap, but no mask or shoe covers. The procedure has not yet started. Which zone is this nurse appropriately dressed for?',
+    options: [
+      'Restricted zone',
+      'Sterile field',
+      'Semi-restricted zone',
+      'Operating room with active surgery'
+    ],
+    answer: 2,
+    concept: 'Zone Match',
+    rationale: 'Scrubs and caps without mask and shoe covers is appropriate for the semi-restricted zone only. Restricted zone and active OR require mask and shoe covers.',
+    others: {
+      0: 'Restricted zone requires mask and shoe covers.',
+      1: 'Sterile field requires sterile gown and gloves.',
+      3: 'Active OR is restricted zone; full attire required.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'During an intraoperative crisis, the team identifies MH. Which medication should the nurse prepare first?',
+    options: [
+      'IV dantrolene',
+      'IV atropine',
+      'IV epinephrine',
+      'IV calcium gluconate'
+    ],
+    answer: 0,
+    concept: 'First-Line MH Drug',
+    rationale: 'IV dantrolene is the primary medication for MH. It acts as a muscle relaxant and reverses the hypermetabolic muscle state.',
+    others: {
+      1: 'Atropine treats bradycardia, not MH.',
+      2: 'Epinephrine treats anaphylaxis or cardiac arrest.',
+      3: 'Calcium worsens MH and is contraindicated.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A patient develops MH during surgery. The team has stopped anesthesia. What should the nurse expect to happen next regarding the surgery?',
+    options: [
+      'The surgery will be completed quickly to minimize anesthesia time',
+      'The surgery will continue with reduced anesthesia',
+      'The surgery will be moved to a different OR room',
+      'The surgery will be postponed'
+    ],
+    answer: 3,
+    concept: 'Surgery Postponement',
+    rationale: 'The surgery should be postponed when MH is recognized. Patient stabilization is the priority, and continued surgery would worsen the metabolic crisis.',
+    others: {
+      0: 'Rushing to complete surgery worsens patient status.',
+      1: 'Anesthesia must be STOPPED entirely.',
+      2: 'Moving rooms does not address the underlying crisis.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which patient on the surgical schedule is at highest risk for MH?',
+    options: [
+      'A patient with type 2 diabetes scheduled for hernia repair',
+      'A patient who reports environmental allergies',
+      'A patient with a history of seasonal asthma',
+      'A patient whose brother had unexplained intraoperative cardiac arrest'
+    ],
+    answer: 3,
+    concept: 'Highest Risk Patient',
+    rationale: 'A sibling with unexplained intraoperative cardiac arrest strongly suggests inherited MH. MH is inherited and family history of anesthesia complications is the key risk factor.',
+    others: {
+      0: 'Diabetes is not a risk factor for MH.',
+      1: 'Environmental allergies do not predict MH.',
+      2: 'Seasonal asthma is not a risk factor for MH.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A scrub nurse drops a sterile instrument onto the floor during a procedure. What is the priority action?',
+    options: [
+      'Pick it up and rinse it with sterile saline',
+      'Wipe it with alcohol and return it to the sterile field',
+      'Discard the instrument and request a sterile replacement',
+      'Continue using the instrument if no contamination is visible'
+    ],
+    answer: 2,
+    concept: 'Dropped Instrument',
+    rationale: 'A dropped instrument is contaminated and cannot be returned to the sterile field. Discard it and request a sterile replacement to maintain strict surgical asepsis.',
+    others: {
+      0: 'Saline rinse does not restore sterility.',
+      1: 'Alcohol wipe does not sterilize a contaminated instrument.',
+      3: 'Visible contamination is not the only standard — once dropped, it is contaminated.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A nurse is reviewing safety priorities for the intraoperative period. Which goal addresses prevention of hypothermia?',
+    options: [
+      'Maintaining patient safety',
+      'Preserving patient dignity',
+      'Maintaining homeostasis',
+      'Documenting the procedure'
+    ],
+    answer: 2,
+    concept: 'Homeostasis Goal',
+    rationale: 'Maintaining homeostasis includes oxygenation, circulation, AND temperature. Preventing hypothermia falls under maintaining homeostasis.',
+    others: {
+      0: 'Patient safety is broader than temperature.',
+      1: 'Dignity addresses privacy and respect, not temperature.',
+      3: 'Documentation is administrative, not a temperature goal.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'During surgery, the nurse administers an antibiotic 30 minutes before incision. Which goal is being supported?',
+    options: [
+      'Preserving patient dignity',
+      'Preventing surgical site infection',
+      'Maintaining airway patency',
+      'Improving cosmetic wound outcomes'
+    ],
+    answer: 1,
+    concept: 'Prophylactic Antibiotic',
+    rationale: 'Preoperative antibiotic timing is part of preventing surgical site infection — a primary intraoperative goal.',
+    others: {
+      0: 'Antibiotics do not address dignity.',
+      2: 'Antibiotics do not maintain airway patency.',
+      3: 'Antibiotics affect infection, not cosmetic outcomes.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A new circulating nurse asks how to identify the unrestricted zone. What is the best response?',
+    options: [
+      '"It is the area where street clothes are permitted."',
+      '"It is the area where sterile gowns are required."',
+      '"It is the operating room itself during surgery."',
+      '"It is the area requiring shoe covers and masks."'
+    ],
+    answer: 0,
+    concept: 'Unrestricted Identification',
+    rationale: 'The unrestricted zone is where street clothes are allowed — typically waiting areas, family lounges, and some hallways outside surgical suites.',
+    others: {
+      1: 'Sterile gowns are for the sterile field, not the unrestricted zone.',
+      2: 'The OR is the restricted zone.',
+      3: 'That describes the restricted zone.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A patient develops jaw rigidity 12 minutes after anesthesia induction. Which laboratory finding does the nurse anticipate?',
+    options: [
+      'Decreased serum glucose with mild hypoglycemia',
+      'Elevated end-tidal CO₂ and metabolic acidosis',
+      'Decreased white blood cell count and lymphopenia',
+      'Elevated serum albumin and total protein levels'
+    ],
+    answer: 1,
+    concept: 'MH Lab Findings',
+    rationale: 'MH causes hypermetabolism with increased CO₂ production (hypercapnia) and metabolic acidosis from anaerobic muscle activity.',
+    others: {
+      0: 'Glucose changes are not the hallmark of MH.',
+      2: 'WBC changes are not characteristic of MH.',
+      3: 'Albumin is not affected by MH.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'The nurse is admitting a patient to the OR. Which intraoperative period activity occurs FIRST?',
+    options: [
+      'Surgical incision',
+      'Patient is transferred onto the OR bed',
+      'Patient is admitted to PACU',
+      'Anesthesia induction is completed'
+    ],
+    answer: 1,
+    concept: 'First Intraop Event',
+    rationale: 'The intraoperative period begins when the patient is transferred onto the OR bed. This is the first defining event of the intraoperative phase.',
+    others: {
+      0: 'Incision occurs after intraop has begun.',
+      2: 'PACU admission ends the intraoperative period.',
+      3: 'Anesthesia induction occurs after the patient is on the OR bed.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A scrub nurse observes the surgeon\'s sterile gown brushing against an unsterile field. What is the most appropriate action?',
+    options: [
+      'Notify the surgeon immediately so the gown can be changed',
+      'Continue the procedure since the surgeon is in charge',
+      'Document the event and notify the surgeon after surgery',
+      'Spray the gown with sterile saline to decontaminate it'
+    ],
+    answer: 0,
+    concept: 'Gown Contamination',
+    rationale: 'Notify the surgeon immediately so the contaminated gown can be replaced. Strict surgical asepsis must be maintained to prevent surgical site infection.',
+    others: {
+      1: 'Continuing risks patient infection.',
+      2: 'Post-op documentation does not protect the patient now.',
+      3: 'Saline does not restore sterility.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A nurse is preparing a patient with MH risk for surgery. Which anesthetic approach should the nurse expect?',
+    options: [
+      'Standard inhalational anesthetics',
+      'MH-trigger-free anesthetic agents',
+      'Higher doses of standard anesthetics',
+      'No anesthesia, only sedation'
+    ],
+    answer: 1,
+    concept: 'MH-Safe Anesthesia',
+    rationale: 'For patients with MH risk, anesthesia providers select trigger-free agents to avoid inducing the crisis. Standard inhalational anesthetics are common triggers.',
+    others: {
+      0: 'Standard inhalationals are common MH triggers.',
+      2: 'Higher doses of triggers worsen risk.',
+      3: 'Most surgeries require anesthesia, not just sedation.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'During surgery the patient becomes hypotensive and tachycardic with elevated CO₂. The nurse identifies possible MH. Which nursing action should occur immediately?',
+    options: [
+      'Begin chest compressions',
+      'Increase room temperature to prevent shivering',
+      'Disconnect IV fluids to limit volume overload',
+      'Communicate the assessment findings to the surgical team'
+    ],
+    answer: 3,
+    concept: 'Communication First',
+    rationale: 'Priority first action when MH is suspected is to communicate to the surgical team. Prompt recognition allows anesthesia to be stopped and dantrolene given.',
+    others: {
+      0: 'CPR is not indicated unless cardiac arrest occurs.',
+      1: 'Warming worsens MH.',
+      2: 'IV fluids are needed for support; do not disconnect.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A circulating nurse documents the instrument count at the start, during closure, and at end of procedure. Which goal does this support?',
+    options: [
+      'Maintaining patient dignity',
+      'Reducing surgical billing complexity',
+      'Maintaining patient safety',
+      'Speeding the surgical procedure'
+    ],
+    answer: 2,
+    concept: 'Counts and Safety',
+    rationale: 'Instrument counts support patient safety by preventing retained surgical items. Patient safety is a primary intraoperative goal.',
+    others: {
+      0: 'Counts do not relate to dignity.',
+      1: 'Counts serve safety, not billing.',
+      3: 'Counts may slow the procedure but are required for safety.'
+    }
+  }
+];
+
+// === QUIZ ENGINE ===
+let currentQ = 0;
+let totalPts = 0;
+let answers = [];
+let selectedOption = null;
+
+function begin() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  selectedOption = null;
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+  document.getElementById('progress').style.width = `${(currentQ / questions.length) * 100}%`;
+  document.getElementById('q-stem').textContent = q.stem;
+  const optsHtml = q.options.map((opt, i) => `
+    <div class="option" data-idx="${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${String.fromCharCode(65+i)}.</span>
+      <span>${opt}</span>
+    </div>
+  `).join('');
+  document.getElementById('q-options').innerHTML = optsHtml;
+  document.getElementById('rationale-area').classList.add('hidden');
+  document.getElementById('rationale-area').innerHTML = '';
+  document.getElementById('submit-btn').classList.remove('hidden');
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('next-btn').classList.add('hidden');
+}
+
+function selectOption(idx) {
+  selectedOption = idx;
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.option[data-idx="${idx}"]`).classList.add('selected');
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+  const q = questions[currentQ];
+  const correct = q.answer;
+  const isCorrect = selectedOption === correct;
+  const pts = isCorrect ? 1 : 0;
+  totalPts += pts;
+  answers.push({ q, selected: selectedOption, correct, pts });
+
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.add('locked');
+    el.onclick = null;
+    if (i === correct) el.classList.add('correct');
+    else if (i === selectedOption) el.classList.add('wrong');
+  });
+
+  let othersHtml = '';
+  if (q.others) {
+    othersHtml = '<div class="others-list">';
+    Object.keys(q.others).forEach(k => {
+      othersHtml += `<div><strong>${String.fromCharCode(65+parseInt(k))}.</strong> ${q.others[k]}</div>`;
+    });
+    othersHtml += '</div>';
+  }
+
+  const ratHtml = `
+    <div class="rationale">
+      <span class="concept-pill">${q.concept}</span>
+      <div><strong>${isCorrect ? 'Correct.' : 'Incorrect.'}</strong> ${q.rationale}</div>
+      ${q.deepExplanation ? `<div style="margin-top:8px; color: var(--ink-soft);">${q.deepExplanation}</div>` : ''}
+      ${othersHtml}
+    </div>
+  `;
+  const rArea = document.getElementById('rationale-area');
+  rArea.innerHTML = ratHtml;
+  rArea.classList.remove('hidden');
+  document.getElementById('submit-btn').classList.add('hidden');
+  document.getElementById('next-btn').classList.remove('hidden');
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  const pct = (totalPts / questions.length) * 100;
+  const scoreEl = document.getElementById('r-score');
+  scoreEl.textContent = `${pct.toFixed(0)}%`;
+  if (pct >= 85) scoreEl.classList.add('pass');
+  else if (pct >= 70) scoreEl.classList.add('borderline');
+  else scoreEl.classList.add('fail');
+  document.getElementById('r-pts').textContent = `${totalPts.toFixed(1)} / ${questions.length} points`;
+
+  let msg = '';
+  if (pct >= 90) msg = 'Excellent — you handle priority decisions well.';
+  else if (pct >= 77) msg = 'Passing — review missed scenarios for the test.';
+  else if (pct >= 60) msg = 'Below passing — focus on priority and safety judgments.';
+  else msg = 'This chapter needs deeper review. Re-read scenarios and retake.';
+  document.getElementById('r-msg').textContent = msg;
+
+  const missed = answers.filter(a => a.pts < 1);
+  if (missed.length > 0) {
+    let html = '<h3>Missed Concepts</h3>';
+    missed.forEach(m => {
+      html += `<div class="missed-item">
+        <div class="stem">${m.q.stem}</div>
+        <div class="ans">Correct: ${String.fromCharCode(65+m.correct)}. ${m.q.options[m.correct]}</div>
+        <div class="rat">${m.q.rationale}</div>
+      </div>`;
+    });
+    document.getElementById('missed-section').innerHTML = html;
+  }
+
+  const result = {
+    pct: parseFloat(pct.toFixed(1)),
+    pts: parseFloat(totalPts.toFixed(1)),
+    total: questions.length,
+    date: new Date().toISOString().split('T')[0]
+  };
+  localStorage.setItem('score_intraoperative_deepdrill', JSON.stringify(result));
+}
+</script>
+</body>
+</html>

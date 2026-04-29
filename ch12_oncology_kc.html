@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch 12 Oncology — Knowledge Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a2540;
+  --navy-soft: #1a3a5c;
+  --teal: #0d9488;
+  --teal-soft: #14b8a6;
+  --teal-pale: #f0fdfa;
+  --purple: #7c3aed;
+  --purple-pale: #f5f3ff;
+  --gold: #f59e0b;
+  --ink: #1a1a1a;
+  --ink-soft: #3a3a3a;
+  --muted: #6b7280;
+  --bg: #fafaf7;
+  --card: #ffffff;
+  --line: #e5e0d5;
+  --correct: #059669;
+  --correct-bg: #ecfdf5;
+  --wrong: #dc2626;
+  --wrong-bg: #fef2f2;
+  --partial: #d97706;
+  --partial-bg: #fffbeb;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  padding: 32px 16px 80px;
+  min-height: 100vh;
+}
+.container { max-width: 760px; margin: 0 auto; }
+.eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--teal);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 36px;
+  color: var(--navy);
+  margin-bottom: 8px;
+  line-height: 1.15;
+}
+.tagline { color: var(--muted); margin-bottom: 32px; font-size: 16px; }
+.start-card, .question-card, .results-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 32px;
+  margin-bottom: 24px;
+}
+.start-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 24px 0;
+}
+.start-stat {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+}
+.start-stat-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  color: var(--teal);
+  display: block;
+}
+.start-stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.btn {
+  background: var(--teal);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn:hover { background: #0b7a70; }
+.btn:disabled { background: var(--muted); cursor: not-allowed; }
+.btn-secondary { background: var(--navy); }
+.btn-secondary:hover { background: var(--navy-soft); }
+.progress-bar {
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--teal);
+  transition: width 0.3s;
+}
+.q-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+.q-stem {
+  font-size: 18px;
+  color: var(--ink);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.option {
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--card);
+  font-size: 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.option:hover:not(.locked) { border-color: var(--teal); background: var(--teal-pale); }
+.option.selected { border-color: var(--teal); background: var(--teal-pale); }
+.option.correct { border-color: var(--correct); background: var(--correct-bg); }
+.option.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+.option-letter {
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+  color: var(--muted);
+  min-width: 18px;
+}
+.option.correct .option-letter { color: var(--correct); }
+.option.wrong .option-letter { color: var(--wrong); }
+.rationale {
+  background: var(--teal-pale);
+  border-left: 3px solid var(--teal);
+  padding: 16px 20px;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.rationale strong { color: var(--navy); }
+.concept-pill {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  background: var(--teal);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.others-list {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.others-list div { margin-bottom: 6px; }
+.btn-row { display: flex; gap: 12px; justify-content: flex-end; }
+.results-score {
+  font-family: 'DM Serif Display', serif;
+  font-size: 56px;
+  text-align: center;
+  margin: 12px 0;
+}
+.results-score.pass { color: var(--correct); }
+.results-score.borderline { color: var(--partial); }
+.results-score.fail { color: var(--wrong); }
+.results-pts {
+  font-family: 'DM Mono', monospace;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+.perf-msg {
+  text-align: center;
+  margin: 16px 0 32px;
+  font-size: 16px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.missed-section h3 {
+  font-family: 'DM Serif Display', serif;
+  color: var(--navy);
+  margin-bottom: 16px;
+  font-size: 22px;
+}
+.missed-item {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: var(--bg);
+  font-size: 14px;
+}
+.missed-item .stem { font-weight: 500; margin-bottom: 8px; }
+.missed-item .ans { color: var(--correct); margin-bottom: 8px; font-family: 'DM Mono', monospace; font-size: 13px; }
+.missed-item .rat { color: var(--ink-soft); font-size: 13px; }
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--navy);
+  color: white;
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 100px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 50;
+}
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-btn">← STUDY HUB</a>
+<div class="container">
+
+<div id="start-screen">
+  <div class="eyebrow">Knowledge Check · Chapter 12</div>
+  <h1>Oncology Nursing Management</h1>
+  <p class="tagline">Direct recall: chemo side effects, neutropenic precautions, radiation safety, CBC monitoring.</p>
+  <div class="start-card">
+    <div class="start-stats">
+      <div class="start-stat"><span class="start-stat-num">25</span><span class="start-stat-label">Questions</span></div>
+      <div class="start-stat"><span class="start-stat-num">MC</span><span class="start-stat-label">Format</span></div>
+      <div class="start-stat"><span class="start-stat-num">Yes</span><span class="start-stat-label">Rationale</span></div>
+    </div>
+    <p style="margin-bottom: 20px; color: var(--ink-soft);">Each question is direct recall from your review guides. Answer, get instant rationale, move on.</p>
+    <button class="btn" onclick="begin()">Begin</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="hidden">
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="question-card">
+    <div class="q-header">
+      <span id="q-counter">Question 1 of 25</span>
+      <span id="q-points">0 pts</span>
+    </div>
+    <div class="q-stem" id="q-stem"></div>
+    <div class="options" id="q-options"></div>
+    <div id="rationale-area" class="hidden"></div>
+    <div class="btn-row">
+      <button class="btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+      <button class="btn btn-secondary hidden" id="next-btn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div id="results-screen" class="hidden">
+  <div class="results-card">
+    <div class="eyebrow">Results · Knowledge Check</div>
+    <h1>Oncology</h1>
+    <div class="results-score" id="r-score">0%</div>
+    <div class="results-pts" id="r-pts">0 / 25 points</div>
+    <div class="perf-msg" id="r-msg"></div>
+    <div class="btn-row" style="justify-content: center; margin-bottom: 32px;">
+      <button class="btn" onclick="location.reload()">Retry Quiz</button>
+      <a href="index.html" class="btn btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center;">Back to Hub</a>
+    </div>
+    <div class="missed-section" id="missed-section"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'What is the highest priority nursing intervention for patients receiving chemotherapy?',
+    options: [
+      'Infection prevention',
+      'Monitoring fluid and electrolyte balance',
+      'Pre-medicating with antiemetics',
+      'Encouraging small frequent meals'
+    ],
+    answer: 0,
+    concept: 'Chemo Priority',
+    rationale: 'Infection prevention is the highest priority. Nurses must monitor for neutropenia and implement neutropenic precautions.',
+    deepExplanation: 'Infection is the leading cause of death in cancer patients, which is why neutropenic precautions take priority over all other interventions.',
+    others: {
+      1: 'Important but not the top priority — fluid/electrolyte monitoring addresses dehydration from N/V, secondary to infection risk.',
+      2: 'Pre-medication minimizes side effects but does not prevent the most lethal complication (sepsis).',
+      3: 'Nutrition support is essential but does not prevent life-threatening infection.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A patient on chemotherapy must immediately report which finding to the provider?',
+    options: [
+      'Mild fatigue after walking',
+      'Loss of appetite for one day',
+      'Fever of 100.4°F lasting more than 1 hour',
+      'Hair thinning at the temples'
+    ],
+    answer: 2,
+    concept: 'Fever Reporting',
+    rationale: 'A fever of 100.4°F or higher lasting more than 1 hour must be reported immediately. The immune system is too weak to fight infection on its own.',
+    others: {
+      0: 'Mild fatigue is expected with chemo and does not indicate emergent infection.',
+      1: 'Decreased appetite is common with chemo but not an emergency.',
+      3: 'Alopecia is a known side effect of many chemo agents — expected, not urgent.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'What is the #1 prevention strategy for neutropenic precautions?',
+    options: [
+      'Strict hand hygiene',
+      'Wearing N95 masks in the room',
+      'Daily chlorhexidine baths',
+      'Limiting visitor numbers'
+    ],
+    answer: 0,
+    concept: 'Neutropenic Hand Hygiene',
+    rationale: 'Strict hand hygiene is the #1 prevention strategy for neutropenic precautions. Staff must wear gloves and wash hands before entering and leaving.',
+    others: {
+      1: 'Masks are part of standard precautions but hand hygiene remains #1.',
+      2: 'Chlorhexidine baths are used in some surgical preps, not a defining neutropenic precaution.',
+      3: 'Visitor limits help but do not replace handwashing as the top intervention.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Which dietary order would the nurse expect for a neutropenic patient?',
+    options: [
+      'Regular diet with fresh raw fruits and salads at every meal',
+      'Clear liquids only until the absolute neutrophil count normalizes',
+      'No unwashed fruits/vegetables or rare-cooked meat',
+      'High-fiber diet rich in raw bran cereal and uncooked oats'
+    ],
+    answer: 2,
+    concept: 'Neutropenic Diet',
+    rationale: 'Neutropenic patients must avoid unwashed fruits/vegetables and rare-cooked meat because these can carry pathogens the immune system cannot fight.',
+    others: {
+      0: 'Fresh unwashed produce is a contamination risk in neutropenia.',
+      1: 'Clear liquids are not required — patients need calories and protein.',
+      3: 'Raw bran is unprocessed and may carry contaminants; not appropriate.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Which procedures must be avoided in a neutropenic patient?',
+    options: [
+      'Oral medications by mouth',
+      'Subcutaneous injections in the abdomen',
+      'IV piggyback antibiotics',
+      'Rectal procedures, suppositories, and enemas'
+    ],
+    answer: 3,
+    concept: 'Avoid Rectal Procedures',
+    rationale: 'Rectal procedures, suppositories, and enemas are avoided due to infection risk — the rectal mucosa can tear and introduce bacteria.',
+    others: {
+      0: 'Oral meds are routine and safe in neutropenia.',
+      1: 'SubQ injections are acceptable with proper skin prep.',
+      2: 'IV antibiotics are often the treatment, not a contraindication.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient should monitor which lab value most carefully for risk of life-threatening sepsis?',
+    options: [
+      'Hemoglobin and hematocrit',
+      'Platelet count and INR',
+      'Serum sodium and potassium',
+      'Absolute Neutrophil Count (ANC)'
+    ],
+    answer: 3,
+    concept: 'ANC Monitoring',
+    rationale: 'The ANC indicates neutrophil count. If too low, the patient is at high risk for life-threatening sepsis.',
+    others: {
+      0: 'Hemoglobin reflects anemia risk, not sepsis risk.',
+      1: 'Platelets reflect bleeding risk, not infection risk.',
+      2: 'Electrolytes do not reflect infection susceptibility.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A patient on chemo reports bruising and small red spots on the legs. Which lab value is the nurse most concerned about?',
+    options: [
+      'WBC',
+      'Platelets',
+      'Hemoglobin',
+      'Sodium'
+    ],
+    answer: 1,
+    concept: 'Thrombocytopenia Signs',
+    rationale: 'Petechiae (small red spots) and bruising indicate thrombocytopenia. The patient should report bruising, petechiae, or bleeding gums.',
+    others: {
+      0: 'Low WBC causes infection risk, not bleeding signs.',
+      2: 'Low hemoglobin causes fatigue and dyspnea, not petechiae.',
+      3: 'Sodium imbalance does not produce petechiae.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'When should bleeding precautions be instituted for a chemo patient? (Normal platelets: 150,000-400,000; WBC: 4,000-11,000; Hgb: 12-18 g/dL; ANC: 1,500-8,000)',
+    options: [
+      'When platelets drop below 150,000',
+      'When WBC drops below 4,000',
+      'When hemoglobin drops below 10',
+      'When ANC drops below 1,500'
+    ],
+    answer: 0,
+    concept: 'Platelet Threshold',
+    rationale: 'Bleeding precautions begin when platelets drop below 150,000 (normal 150,000-400,000). This protects the patient from spontaneous bleeding.',
+    others: {
+      1: 'Low WBC indicates infection risk; triggers neutropenic precautions, not bleeding precautions.',
+      2: 'Low hemoglobin signals anemia, treated differently than bleeding risk.',
+      3: 'A low ANC signals neutropenic precautions, separate from bleeding.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Which symptoms should a chemo patient report that may indicate anemia?',
+    options: [
+      'Excessive fatigue, dyspnea, or chest pain',
+      'Mouth sores, gum bleeding, and stomatitis',
+      'Fever, productive cough, and sore throat',
+      'Petechiae, ecchymoses, and easy bruising'
+    ],
+    answer: 0,
+    concept: 'Anemia Signs',
+    rationale: 'Anemia from chemo presents as excessive fatigue, shortness of breath, or chest pain — the body cannot deliver enough oxygen.',
+    others: {
+      1: 'Mouth sores indicate stomatitis; bleeding gums signal thrombocytopenia.',
+      2: 'Fever and productive cough indicate possible infection in a neutropenic patient.',
+      3: 'Petechiae and bruising signal low platelets, not anemia.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Which oral hygiene tool should a chemo patient use to prevent bleeding?',
+    options: [
+      'A medium-bristle toothbrush twice daily',
+      'A soft-bristle toothbrush',
+      'A water flosser at high pressure',
+      'A wooden toothpick after each meal'
+    ],
+    answer: 1,
+    concept: 'Soft-Bristle Brush',
+    rationale: 'Use a soft-bristle toothbrush to prevent bleeding and manage stomatitis (mouth sores).',
+    others: {
+      0: 'Medium bristles are too abrasive for fragile oral mucosa.',
+      2: 'High pressure can traumatize the gums.',
+      3: 'Wooden picks can lacerate gums and introduce infection.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'How much fluid intake should a chemotherapy patient maintain daily unless contraindicated?',
+    options: [
+      '0.5–1 liter per day',
+      '1–2 liters per day',
+      '2–3 liters per day',
+      '4–5 liters per day'
+    ],
+    answer: 2,
+    concept: 'Hydration Goal',
+    rationale: 'Stay hydrated with 2–3 liters of fluid per day unless contraindicated.',
+    others: {
+      0: 'Too low — increases dehydration risk from chemo-induced N/V.',
+      1: 'Below the recommended target during chemotherapy.',
+      3: 'Excessive — risks fluid overload and dilutional electrolyte issues.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'What is the most common gastrointestinal side effect of chemotherapy?',
+    options: [
+      'Constipation lasting 2 weeks',
+      'Nausea and vomiting persisting 24-48 hours',
+      'Bloody diarrhea immediately after infusion',
+      'Severe abdominal cramping with rebound'
+    ],
+    answer: 1,
+    concept: 'Chemo N/V Timeline',
+    rationale: 'Nausea and vomiting are the most common GI side effects, persisting 24-48 hours and delayed up to 1 week.',
+    others: {
+      0: 'Constipation occurs but is not the most common GI side effect.',
+      2: 'Bloody diarrhea is not a typical immediate chemo finding.',
+      3: 'Rebound tenderness suggests peritonitis, not chemo toxicity.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Which electrolyte imbalances are associated with tumor lysis syndrome?',
+    options: [
+      'Hyperkalemia, hyperphosphatemia, and hypocalcemia',
+      'Hyponatremia, hypokalemia, and hypercalcemia',
+      'Hypokalemia, hypophosphatemia, and hypernatremia',
+      'Hypercalcemia, hypermagnesemia, and hyperchloremia'
+    ],
+    answer: 0,
+    concept: 'Tumor Lysis Labs',
+    rationale: 'Tumor lysis can cause hyperkalemia, hyperphosphatemia, hypocalcemia, and renal damage when cancer cells break down rapidly.',
+    others: {
+      1: 'These are not the classic tumor lysis derangements.',
+      2: 'Tumor lysis raises potassium and phosphate, it does not lower them.',
+      3: 'Hypercalcemia is opposite of what tumor lysis produces.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Which cardiopulmonary complication is associated with chemotherapy?',
+    options: [
+      'Cardiac toxicity and heart failure',
+      'Aortic stenosis from valve calcification',
+      'Mitral valve prolapse with regurgitation',
+      'Pericardial constriction and tamponade'
+    ],
+    answer: 0,
+    concept: 'Cardiotoxicity',
+    rationale: 'Chemo carries the potential for cardiac toxicity and heart failure, which is why baseline and ongoing cardiac assessment matters.',
+    others: {
+      1: 'Aortic stenosis is a degenerative valvular disorder, not a chemo complication.',
+      2: 'Mitral valve prolapse is congenital or degenerative.',
+      3: 'Pericardial constriction is rare and not a primary chemo concern.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A patient receiving external radiation therapy asks about caring for skin markings. What should the nurse teach?',
+    options: [
+      'Scrub the markings off after each treatment',
+      'Cover the markings with a thick adhesive bandage',
+      'Do NOT remove the skin markings',
+      'Reapply markings yourself with a permanent marker'
+    ],
+    answer: 2,
+    concept: 'Radiation Skin Markings',
+    rationale: 'Do NOT remove skin markings — they guide the radiation beam to the correct location. Removing them disrupts treatment accuracy.',
+    others: {
+      0: 'Scrubbing removes the alignment markings.',
+      1: 'Adhesive bandages can irritate radiated skin and remove markings.',
+      3: 'Patients should never reapply markings — the radiation team places them precisely.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Which skin care instruction is appropriate for a patient receiving external radiation?',
+    options: [
+      'Apply lotion or powder generously to the treated area',
+      'Wear tight-fitting clothing for support',
+      'Sunbathe to maintain vitamin D levels',
+      'Clean gently with mild soap and water'
+    ],
+    answer: 3,
+    concept: 'Radiation Skin Care',
+    rationale: 'Clean the treated area gently with mild soap and water. Avoid anything that can cause skin irritation.',
+    others: {
+      0: 'No lotions or powders unless prescribed — they can interfere with radiation.',
+      1: 'Loose clothing is recommended; tight clothing irritates fragile skin.',
+      2: 'Avoid sun exposure during treatment and for 1 year after.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'For how long should a patient avoid sun exposure to a radiated area?',
+    options: [
+      '1 week after treatment',
+      '1 month after treatment',
+      '6 months after treatment',
+      'During treatment and 1 year after'
+    ],
+    answer: 3,
+    concept: 'Sun Avoidance Duration',
+    rationale: 'Avoid sun exposure during treatment AND 1 year after — the skin remains photosensitive for an extended period.',
+    others: {
+      0: 'Far too short — skin remains highly sensitive long after treatment ends.',
+      1: 'Insufficient — radiation effects on skin persist.',
+      2: 'Closer but still short of the recommended timeframe.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Which condition is brachytherapy commonly used to treat?',
+    options: [
+      'Acute leukemia',
+      'Prostate cancer',
+      'Liver metastases',
+      'Brain glioblastoma'
+    ],
+    answer: 1,
+    concept: 'Brachytherapy Use',
+    rationale: 'Brachytherapy (sealed implants placed inside the body) is commonly used for prostate cancer.',
+    others: {
+      0: 'Leukemia is treated with systemic chemo and HSCT, not brachytherapy.',
+      2: 'Liver metastases are typically treated with chemo or external beam.',
+      3: 'Brain tumors usually receive external beam radiation or surgery.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Which room precaution is required for a patient with a brachytherapy implant?',
+    options: [
+      'Negative pressure isolation room',
+      'Semi-private room with HEPA filtration',
+      'Private room with closed door and radiation warning sign',
+      'Standard room with door open for monitoring'
+    ],
+    answer: 2,
+    concept: 'Brachytherapy Room',
+    rationale: 'A private room with closed door and radiation warning sign is required for brachytherapy patients to limit exposure.',
+    others: {
+      0: 'Negative pressure is for airborne pathogens, not radiation.',
+      1: 'Semi-private rooms expose other patients to radiation.',
+      3: 'Open doors expose staff and other patients to radiation.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'When providing direct care to a patient with a brachytherapy implant, the nurse should wear:',
+    options: [
+      'A surgical mask only',
+      'A lead apron',
+      'Sterile gloves only',
+      'An N95 respirator'
+    ],
+    answer: 1,
+    concept: 'Lead Apron',
+    rationale: 'A lead apron must be worn during direct contact with the patient to shield from radiation.',
+    others: {
+      0: 'Masks do not block radiation.',
+      2: 'Sterile gloves do not block radiation.',
+      3: 'N95s block airborne particles, not radiation.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Visitors to a brachytherapy patient should be limited to a maximum of:',
+    options: [
+      '15 minutes per day',
+      '30 minutes per day',
+      '1 hour per day',
+      '2 hours per day'
+    ],
+    answer: 1,
+    concept: 'Visitor Time Limit',
+    rationale: 'Limit visitors to 30 minutes per day to minimize radiation exposure.',
+    others: {
+      0: 'Too short — 30 minutes is the policy limit.',
+      2: '1 hour exceeds the safe daily exposure window.',
+      3: '2 hours far exceeds safe exposure for visitors.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Which staff member is restricted from providing direct care to a patient with a brachytherapy implant?',
+    options: [
+      'A nurse with a recent flu vaccine',
+      'A nurse over age 50',
+      'A male nurse',
+      'A nurse who is pregnant'
+    ],
+    answer: 3,
+    concept: 'Pregnant Staff Restriction',
+    rationale: 'Pregnant nurses must avoid caring for brachytherapy patients due to risk to the fetus from radiation exposure.',
+    others: {
+      0: 'Recent flu vaccine is unrelated to radiation safety.',
+      1: 'Age does not restrict radiation care.',
+      2: 'Sex does not restrict radiation care.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient calls the clinic with a fever, productive cough, and sore throat. What is the priority nursing action?',
+    options: [
+      'Reassure the patient this is normal post-chemo',
+      'Recommend over-the-counter cough suppressant',
+      'Schedule a routine appointment in 1 week',
+      'Assess for sepsis and notify the provider immediately'
+    ],
+    answer: 3,
+    concept: 'Sepsis Priority',
+    rationale: 'Fever, productive cough, or sore throat = priority is to assess for sepsis and notify the provider immediately. The immune system is too weak to fight the infection alone.',
+    others: {
+      0: 'These symptoms are NOT normal post-chemo — they signal possible sepsis.',
+      1: 'OTC suppressants delay treatment of a potentially fatal infection.',
+      2: 'Waiting a week could be fatal in a neutropenic patient.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'How is chronic cancer pain best managed?',
+    options: [
+      'PRN analgesics only when pain is severe',
+      'Scheduled, around-the-clock analgesics',
+      'Once-daily extended-release medications',
+      'Non-pharmacologic methods only to avoid dependence'
+    ],
+    answer: 1,
+    concept: 'Pain Schedule',
+    rationale: 'Chronic cancer pain requires analgesics given on a scheduled, around-the-clock basis rather than PRN.',
+    others: {
+      0: 'PRN dosing leaves gaps and allows pain to escalate.',
+      2: 'Once-daily dosing alone is inadequate for chronic cancer pain.',
+      3: 'Non-pharm methods are adjuncts, not stand-alone therapy.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'What are the two biggest concerns for chemotherapy patients?',
+    options: [
+      'Hypertension and hyperglycemia',
+      'Constipation and weight gain',
+      'Dehydration and confusion',
+      'Infection and pain'
+    ],
+    answer: 3,
+    concept: 'Two Big Concerns',
+    rationale: 'The two biggest concerns with chemo patients are INFECTION and PAIN. Both require ongoing assessment and aggressive management.',
+    others: {
+      0: 'These are common in many chronic illnesses but not the top chemo concerns.',
+      1: 'Both can occur but neither is the primary concern.',
+      2: 'These are common with chemo but not the top two priorities.'
+    }
+  }
+];
+
+// === QUIZ ENGINE ===
+let currentQ = 0;
+let totalPts = 0;
+let answers = [];
+let selectedOption = null;
+
+function begin() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  selectedOption = null;
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+  document.getElementById('progress').style.width = `${(currentQ / questions.length) * 100}%`;
+  document.getElementById('q-stem').textContent = q.stem;
+  const optsHtml = q.options.map((opt, i) => `
+    <div class="option" data-idx="${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${String.fromCharCode(65+i)}.</span>
+      <span>${opt}</span>
+    </div>
+  `).join('');
+  document.getElementById('q-options').innerHTML = optsHtml;
+  document.getElementById('rationale-area').classList.add('hidden');
+  document.getElementById('rationale-area').innerHTML = '';
+  document.getElementById('submit-btn').classList.remove('hidden');
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('next-btn').classList.add('hidden');
+}
+
+function selectOption(idx) {
+  selectedOption = idx;
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.option[data-idx="${idx}"]`).classList.add('selected');
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+  const q = questions[currentQ];
+  const correct = q.answer;
+  const isCorrect = selectedOption === correct;
+  const pts = isCorrect ? 1 : 0;
+  totalPts += pts;
+  answers.push({ q, selected: selectedOption, correct, pts });
+
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.add('locked');
+    el.onclick = null;
+    if (i === correct) el.classList.add('correct');
+    else if (i === selectedOption) el.classList.add('wrong');
+  });
+
+  let othersHtml = '';
+  if (q.others) {
+    othersHtml = '<div class="others-list">';
+    Object.keys(q.others).forEach(k => {
+      othersHtml += `<div><strong>${String.fromCharCode(65+parseInt(k))}.</strong> ${q.others[k]}</div>`;
+    });
+    othersHtml += '</div>';
+  }
+
+  const ratHtml = `
+    <div class="rationale">
+      <span class="concept-pill">${q.concept}</span>
+      <div><strong>${isCorrect ? 'Correct.' : 'Incorrect.'}</strong> ${q.rationale}</div>
+      ${q.deepExplanation ? `<div style="margin-top:8px; color: var(--ink-soft);">${q.deepExplanation}</div>` : ''}
+      ${othersHtml}
+    </div>
+  `;
+  const rArea = document.getElementById('rationale-area');
+  rArea.innerHTML = ratHtml;
+  rArea.classList.remove('hidden');
+  document.getElementById('submit-btn').classList.add('hidden');
+  document.getElementById('next-btn').classList.remove('hidden');
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  const pct = (totalPts / questions.length) * 100;
+  const scoreEl = document.getElementById('r-score');
+  scoreEl.textContent = `${pct.toFixed(0)}%`;
+  if (pct >= 85) scoreEl.classList.add('pass');
+  else if (pct >= 70) scoreEl.classList.add('borderline');
+  else scoreEl.classList.add('fail');
+  document.getElementById('r-pts').textContent = `${totalPts.toFixed(1)} / ${questions.length} points`;
+
+  let msg = '';
+  if (pct >= 90) msg = 'Excellent recall — you know this chapter cold.';
+  else if (pct >= 77) msg = 'Passing — keep reviewing the missed concepts.';
+  else if (pct >= 60) msg = 'Below passing — focus on the missed concepts before the exam.';
+  else msg = 'This chapter needs more review. Re-read the source guide and retake.';
+  document.getElementById('r-msg').textContent = msg;
+
+  const missed = answers.filter(a => a.pts < 1);
+  if (missed.length > 0) {
+    let html = '<h3>Missed Concepts</h3>';
+    missed.forEach(m => {
+      html += `<div class="missed-item">
+        <div class="stem">${m.q.stem}</div>
+        <div class="ans">Correct: ${String.fromCharCode(65+m.correct)}. ${m.q.options[m.correct]}</div>
+        <div class="rat">${m.q.rationale}</div>
+      </div>`;
+    });
+    document.getElementById('missed-section').innerHTML = html;
+  }
+
+  // Save to localStorage
+  const result = {
+    pct: parseFloat(pct.toFixed(1)),
+    pts: parseFloat(totalPts.toFixed(1)),
+    total: questions.length,
+    date: new Date().toISOString().split('T')[0]
+  };
+  localStorage.setItem('score_oncology_knowledge', JSON.stringify(result));
+}
+</script>
+</body>
+</html>

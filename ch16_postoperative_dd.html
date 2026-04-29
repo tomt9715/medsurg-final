@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch 16 Postoperative — Deep Drill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a2540; --navy-soft: #1a3a5c;
+  --teal: #0d9488; --teal-pale: #f0fdfa;
+  --purple: #7c3aed; --purple-pale: #f5f3ff;
+  --gold: #f59e0b; --ink: #1a1a1a; --ink-soft: #3a3a3a; --muted: #6b7280;
+  --bg: #fafaf7; --card: #ffffff; --line: #e5e0d5;
+  --correct: #059669; --correct-bg: #ecfdf5;
+  --wrong: #dc2626; --wrong-bg: #fef2f2;
+  --partial: #d97706; --partial-bg: #fffbeb;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; padding: 32px 16px 80px; min-height: 100vh; }
+.container { max-width: 760px; margin: 0 auto; }
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--purple); text-transform: uppercase; margin-bottom: 12px; }
+h1 { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--navy); margin-bottom: 8px; line-height: 1.15; }
+.tagline { color: var(--muted); margin-bottom: 32px; font-size: 16px; }
+.start-card, .question-card, .results-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 32px; margin-bottom: 24px; }
+.start-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+.start-stat { border: 1px solid var(--line); border-radius: 4px; padding: 16px; text-align: center; }
+.start-stat-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--purple); display: block; }
+.start-stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+.btn { background: var(--purple); color: white; border: none; padding: 14px 32px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.btn:hover { background: #6d28d9; }
+.btn:disabled { background: var(--muted); cursor: not-allowed; }
+.btn-secondary { background: var(--navy); }
+.btn-secondary:hover { background: var(--navy-soft); }
+.progress-bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 24px; }
+.progress-fill { height: 100%; background: var(--purple); transition: width 0.3s; }
+.q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+.q-stem { font-size: 18px; color: var(--ink); margin-bottom: 24px; line-height: 1.5; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.option { border: 1.5px solid var(--line); border-radius: 6px; padding: 14px 18px; cursor: pointer; transition: all 0.15s; background: var(--card); font-size: 15px; display: flex; align-items: flex-start; gap: 12px; }
+.option:hover:not(.locked) { border-color: var(--purple); background: var(--purple-pale); }
+.option.selected { border-color: var(--purple); background: var(--purple-pale); }
+.option.correct { border-color: var(--correct); background: var(--correct-bg); }
+.option.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+.option-letter { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--muted); min-width: 18px; }
+.option.correct .option-letter { color: var(--correct); }
+.option.wrong .option-letter { color: var(--wrong); }
+.rationale { background: var(--purple-pale); border-left: 3px solid var(--purple); padding: 16px 20px; border-radius: 0 6px 6px 0; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+.rationale strong { color: var(--navy); }
+.concept-pill { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.5px; background: var(--purple); color: white; padding: 3px 10px; border-radius: 100px; margin-bottom: 10px; text-transform: uppercase; }
+.others-list { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--ink-soft); }
+.others-list div { margin-bottom: 6px; }
+.btn-row { display: flex; gap: 12px; justify-content: flex-end; }
+.results-score { font-family: 'DM Serif Display', serif; font-size: 56px; text-align: center; margin: 12px 0; }
+.results-score.pass { color: var(--correct); }
+.results-score.borderline { color: var(--partial); }
+.results-score.fail { color: var(--wrong); }
+.results-pts { font-family: 'DM Mono', monospace; text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.perf-msg { text-align: center; margin: 16px 0 32px; font-size: 16px; color: var(--ink-soft); font-style: italic; }
+.missed-section h3 { font-family: 'DM Serif Display', serif; color: var(--navy); margin-bottom: 16px; font-size: 22px; }
+.missed-item { border: 1px solid var(--line); border-radius: 6px; padding: 16px; margin-bottom: 12px; background: var(--bg); font-size: 14px; }
+.missed-item .stem { font-weight: 500; margin-bottom: 8px; }
+.missed-item .ans { color: var(--correct); margin-bottom: 8px; font-family: 'DM Mono', monospace; font-size: 13px; }
+.missed-item .rat { color: var(--ink-soft); font-size: 13px; }
+.back-btn { position: fixed; bottom: 20px; left: 20px; background: var(--navy); color: white; text-decoration: none; padding: 10px 18px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 50; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-btn">← STUDY HUB</a>
+<div class="container">
+
+<div id="start-screen">
+  <div class="eyebrow">Deep Drill · Chapter 16</div>
+  <h1>Postoperative Nursing Care</h1>
+  <p class="tagline">NCLEX-style application: shock recognition, evisceration response, DVT triage, wound complication priorities.</p>
+  <div class="start-card">
+    <div class="start-stats">
+      <div class="start-stat"><span class="start-stat-num">25</span><span class="start-stat-label">Questions</span></div>
+      <div class="start-stat"><span class="start-stat-num">MC</span><span class="start-stat-label">Format</span></div>
+      <div class="start-stat"><span class="start-stat-num">Yes</span><span class="start-stat-label">Rationale</span></div>
+    </div>
+    <p style="margin-bottom: 20px; color: var(--ink-soft);">Higher-difficulty NCLEX-style scenarios. Apply your knowledge to priority and clinical-judgment situations.</p>
+    <button class="btn" onclick="begin()">Begin</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="hidden">
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="question-card">
+    <div class="q-header">
+      <span id="q-counter">Question 1 of 25</span>
+      <span id="q-points">0 pts</span>
+    </div>
+    <div class="q-stem" id="q-stem"></div>
+    <div class="options" id="q-options"></div>
+    <div id="rationale-area" class="hidden"></div>
+    <div class="btn-row">
+      <button class="btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+      <button class="btn btn-secondary hidden" id="next-btn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div id="results-screen" class="hidden">
+  <div class="results-card">
+    <div class="eyebrow">Results · Deep Drill</div>
+    <h1>Postoperative</h1>
+    <div class="results-score" id="r-score">0%</div>
+    <div class="results-pts" id="r-pts">0 / 25 points</div>
+    <div class="perf-msg" id="r-msg"></div>
+    <div class="btn-row" style="justify-content: center; margin-bottom: 32px;">
+      <button class="btn" onclick="location.reload()">Retry Quiz</button>
+      <a href="index.html" class="btn btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center;">Back to Hub</a>
+    </div>
+    <div class="missed-section" id="missed-section"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A nurse is caring for four post-op patients. Which patient should the nurse assess FIRST?',
+    options: [
+      'A patient with absent bowel sounds 3 hours post-op',
+      'A patient who has not voided 4 hours post-op',
+      'A patient reporting incisional pain rated 6/10',
+      'A patient with pallor, cool clammy skin, BP 86/54, HR 128'
+    ],
+    answer: 3,
+    concept: 'Shock Priority Triage',
+    rationale: 'Pallor, cool clammy skin, hypotension, and tachycardia are classic signs of post-op hemorrhage/hypovolemic shock. Assess first and notify the provider.',
+    others: {
+      0: 'Absent bowel sounds at 3 hours post-op is normal early in the post-op period.',
+      1: 'Voiding within 6-8 hours is acceptable; intervention not yet needed.',
+      2: 'Pain 6/10 is concerning but not life-threatening compared to shock.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient suddenly states "Something popped" and the nurse sees abdominal organs protruding through the incision. What is the priority action?',
+    options: [
+      'Gently push the organs back inside with sterile gloved hands',
+      'Apply a dry sterile gauze and tape it firmly in place',
+      'Cover with sterile saline-moistened dressing and call provider',
+      'Position the patient prone and apply firm pressure'
+    ],
+    answer: 2,
+    concept: 'Evisceration Response',
+    rationale: 'Cover with sterile saline-moistened dressing, do NOT reinsert organs, position low-Fowler\'s with knees bent, NPO, and call provider immediately.',
+    others: {
+      0: 'NEVER reinsert protruding organs — risks severe injury and contamination.',
+      1: 'Dry gauze can adhere to and damage exposed organs.',
+      3: 'Prone with pressure further injures the exposed viscera.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient is preparing to cough to clear secretions. Which technique should the nurse teach to prevent dehiscence?',
+    options: [
+      'Cough as forcefully as possible to clear all mucus',
+      'Avoid coughing entirely until the wound has healed',
+      'Lie flat on the abdomen while coughing',
+      'Hold a pillow firmly against the incision while coughing'
+    ],
+    answer: 3,
+    concept: 'Splinting Application',
+    rationale: 'Splint the incision with a pillow when coughing to prevent dehiscence. The pillow supports the wound and reduces strain on sutures.',
+    others: {
+      0: 'Forceful uncontrolled coughing increases dehiscence risk.',
+      1: 'Coughing is needed to prevent atelectasis and pneumonia.',
+      2: 'Lying prone increases abdominal pressure and risk.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient has not voided 7 hours after surgery. Which non-invasive intervention should the nurse try first?',
+    options: [
+      'Run warm water in the sink and use a bladder scanner',
+      'Insert an indwelling Foley catheter immediately',
+      'Administer IV furosemide to force urine production',
+      'Restrict oral fluid intake to reduce bladder distension'
+    ],
+    answer: 0,
+    concept: 'Voiding First Action',
+    rationale: 'At 6-8 hours without voiding, intervention is needed. Run warm water in the sink and use a bladder scanner to check volume before considering a straight cath.',
+    others: {
+      1: 'Indwelling Foley increases UTI risk and is not first-line.',
+      2: 'Diuretics worsen retention without addressing underlying issue.',
+      3: 'Fluid restriction does not promote voiding.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient on day 2 has a temperature of 100.4°F, increasing incisional pain, and yellow-green drainage from the wound. What is the priority action?',
+    options: [
+      'Apply a dry sterile dressing and recheck in 4 hours',
+      'Encourage ambulation to improve circulation to the wound',
+      'Administer the prescribed PRN acetaminophen and document',
+      'Notify the provider — these findings suggest wound infection'
+    ],
+    answer: 3,
+    concept: 'Wound Infection Recognition',
+    rationale: 'Fever, increasing pain, and purulent (yellow-green) drainage are signs of wound infection. Notify the provider for assessment and likely antibiotic therapy.',
+    others: {
+      0: 'Delays infection treatment; provider must be notified.',
+      1: 'Ambulation does not treat an active wound infection.',
+      2: 'Acetaminophen masks fever without addressing infection.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient on bedrest reports new calf pain, swelling, and warmth. Which action is contraindicated?',
+    options: [
+      'Notify the provider immediately',
+      'Massage the calf to improve circulation',
+      'Keep the patient on bedrest until evaluation',
+      'Measure and compare leg circumference bilaterally'
+    ],
+    answer: 1,
+    concept: 'DVT Massage Avoidance',
+    rationale: 'NEVER massage a suspected DVT — this can dislodge the clot and cause a pulmonary embolism. Notify the provider, keep the patient still, and prepare for diagnostic workup.',
+    others: {
+      0: 'Notifying the provider is appropriate and necessary.',
+      2: 'Bedrest until evaluation is appropriate for suspected DVT.',
+      3: 'Measuring circumference helps confirm unilateral swelling.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A patient post-abdominal surgery is using an incentive spirometer. Which technique indicates correct use?',
+    options: [
+      'Exhaling forcefully into the mouthpiece',
+      'Inhaling slowly and deeply to keep the indicator at the goal',
+      'Using the device only when feeling short of breath',
+      'Performing 1 deep breath every shift'
+    ],
+    answer: 1,
+    concept: 'IS Technique',
+    rationale: 'The patient should inhale slowly and deeply to raise and maintain the indicator at the goal level. This expands alveoli and prevents atelectasis.',
+    others: {
+      0: 'IS uses inhalation, not exhalation.',
+      2: 'IS is preventive and used Q2H, not just when symptomatic.',
+      3: 'Once per shift is far too infrequent — Q2H is the standard.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A nurse is caring for a post-op patient with the following findings. Which finding requires immediate intervention?',
+    options: [
+      'Hemoglobin 11.8 g/dL on day 1 post-op (normal 12-18)',
+      'Mild incisional pain rated 4/10 with movement',
+      'Sudden BP drop from 130/80 to 88/52 with HR 122',
+      'Soft, non-distended abdomen with passage of flatus'
+    ],
+    answer: 2,
+    concept: 'Hemodynamic Decline',
+    rationale: 'A sudden BP drop with tachycardia post-op suggests hemorrhage or hypovolemic shock. Immediate intervention required — assess wound, IV fluids, notify provider.',
+    others: {
+      0: 'Hemoglobin 11.8 is mildly low but not emergent.',
+      1: 'Pain 4/10 is manageable and not urgent.',
+      3: 'Soft non-distended abdomen with flatus indicates returning GI function.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient is being discharged. Which statement indicates the patient understands DVT prevention?',
+    options: [
+      '"I will stay in bed for at least one week to let my body heal."',
+      '"I will sit in my recliner with my legs crossed for hours each day."',
+      '"I will avoid drinking fluids so my legs do not swell."',
+      '"I will walk around several times daily and do leg exercises."'
+    ],
+    answer: 3,
+    concept: 'DVT Education',
+    rationale: 'Walking and leg exercises promote venous return and prevent DVT. This statement shows correct understanding.',
+    others: {
+      0: 'Bedrest INCREASES DVT risk through venous stasis.',
+      1: 'Crossing legs compresses veins and promotes clot formation.',
+      2: 'Adequate hydration is needed; restriction worsens clot risk.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient who has been NPO post-surgery suddenly reports sharp, severe chest pain and dyspnea. The patient appears anxious with O₂ sat 86%. What is the priority action?',
+    options: [
+      'Administer oxygen, elevate the head of the bed, notify provider',
+      'Encourage the patient to take slow deep breaths and reassess in 30 minutes',
+      'Help the patient ambulate to improve circulation',
+      'Apply warm compresses to the chest for comfort'
+    ],
+    answer: 0,
+    concept: 'PE Recognition',
+    rationale: 'Sudden chest pain, dyspnea, and hypoxia post-op suggest pulmonary embolism. Administer oxygen, elevate head of bed, stay with the patient, and notify provider immediately.',
+    others: {
+      1: 'Reassess in 30 min is dangerous delay for suspected PE.',
+      2: 'Ambulation is contraindicated with suspected PE.',
+      3: 'Warm compresses do not treat or address PE.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient on day 1 has a Foley catheter. The provider has not yet ordered removal. Which action is most appropriate?',
+    options: [
+      'Question the provider about removal — Foley should come out within 24 hours',
+      'Wait for provider order before raising the issue',
+      'Remove the Foley independently as standard policy',
+      'Leave the Foley in place for at least 5 days for accuracy'
+    ],
+    answer: 0,
+    concept: 'Foley Advocacy',
+    rationale: 'Foley catheters should be removed within 24 hours post-op to reduce CAUTI risk. The nurse should advocate for timely removal by communicating with the provider.',
+    others: {
+      1: 'Waiting passively delays removal and increases infection risk.',
+      2: 'Removing without an order exceeds nursing scope.',
+      3: 'Five days far exceeds the safe window.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient declines to use the incentive spirometer because of pain. What is the best nursing action?',
+    options: [
+      'Document patient refusal and skip the IS use',
+      'Force the patient to use the spirometer immediately',
+      'Administer pain medication, then encourage spirometer use',
+      'Remove the spirometer from the bedside until pain resolves'
+    ],
+    answer: 2,
+    concept: 'Pain-Limited Pulmonary Toileting',
+    rationale: 'Administer pain medication promptly so the patient can tolerate breathing exercises. Pain control enables pulmonary toileting and prevents atelectasis.',
+    others: {
+      0: 'Skipping IS leads to atelectasis and pneumonia.',
+      1: 'Forcing care violates patient autonomy.',
+      3: 'Removing the device prevents the very intervention needed.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient on day 3 has not had a bowel movement and reports abdominal cramping. Bowel sounds are present. What intervention should the nurse implement first?',
+    options: [
+      'Insert a nasogastric tube for decompression',
+      'Administer a soap-suds enema immediately',
+      'Hold all oral intake until stool is passed',
+      'Encourage early ambulation, hydration, and stool softeners'
+    ],
+    answer: 3,
+    concept: 'Constipation First-Line',
+    rationale: 'Early ambulation is the priority intervention for post-op constipation, along with hydration and stool softeners.',
+    others: {
+      0: 'NG decompression is for ileus or obstruction, not simple constipation.',
+      1: 'Enemas are not first-line; conservative measures are tried first.',
+      2: 'Holding oral intake worsens dehydration and constipation.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient is found to have BP 90/60, HR 110, dark concentrated urine, and pallor. Which nursing action is most appropriate?',
+    options: [
+      'Document findings and reassess in 1 hour',
+      'Reduce IV fluid rate to prevent overload',
+      'Notify the provider and assess all IV lines',
+      'Apply a heating blanket and elevate the head of the bed'
+    ],
+    answer: 2,
+    concept: 'Shock Action',
+    rationale: 'These findings suggest hypovolemic shock. Notify the provider and assess all IV lines (and flush with saline). IV fluids may need to be increased or replaced.',
+    others: {
+      0: 'Reassessing in 1 hour delays critical intervention.',
+      1: 'Reducing fluids worsens hypovolemia.',
+      3: 'Heat does not address hypovolemia and could worsen vasodilation.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which post-op patient has the highest risk for DVT?',
+    options: [
+      'A 25-year-old after appendectomy who is ambulating',
+      'A 35-year-old after laparoscopic cholecystectomy',
+      'A 40-year-old after outpatient knee arthroscopy',
+      'A 70-year-old after total hip replacement on bedrest'
+    ],
+    answer: 3,
+    concept: 'DVT Risk Stratification',
+    rationale: 'Older age, major orthopedic surgery, and bedrest combine to make this patient highest risk for DVT. Major joint replacement is a top DVT risk factor.',
+    others: {
+      0: 'Young and ambulatory — low risk.',
+      1: 'Laparoscopic procedures and quicker recovery = lower risk.',
+      2: 'Outpatient minor procedure = low risk.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A patient with evisceration is being prepared for emergency surgery. Which order should the nurse anticipate?',
+    options: [
+      'Maintain NPO status',
+      'Begin clear liquids to maintain hydration',
+      'Encourage ambulation to the bathroom',
+      'Apply a tight binder over the incision'
+    ],
+    answer: 0,
+    concept: 'Evisceration NPO',
+    rationale: 'NPO is required because emergency surgery is needed. Oral intake before surgery increases aspiration risk during anesthesia.',
+    others: {
+      1: 'Clear liquids are contraindicated before emergency surgery.',
+      2: 'Ambulation is contraindicated with evisceration.',
+      3: 'Tight binders compress organs further; saline-moist sterile dressing is correct.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient is being instructed on use of anti-embolism stockings. Which patient statement requires correction?',
+    options: [
+      '"I will wear them during the day to keep blood flowing."',
+      '"I will roll them down at night so they don\'t bother me."',
+      '"I will take them off briefly each day for skin care."',
+      '"I will tell my nurse if I notice any skin breakdown."'
+    ],
+    answer: 1,
+    concept: 'Stocking Misuse',
+    rationale: 'Rolling stockings down creates a tourniquet effect that worsens venous return and can cause DVT. The patient needs more teaching.',
+    others: {
+      0: 'Correct — daytime wear promotes venous return.',
+      2: 'Correct — brief removal allows skin assessment.',
+      3: 'Correct — skin breakdown reporting is appropriate.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which post-op assessment finding is normal in the first few hours after surgery?',
+    options: [
+      'Spreading redness around the incision',
+      'BP 80/50 with HR 130',
+      'Absent bowel sounds',
+      'Purulent drainage from the wound'
+    ],
+    answer: 2,
+    concept: 'Normal Early Findings',
+    rationale: 'Absent bowel sounds early in the post-op period is normal due to anesthesia effects on GI motility. The other findings are concerning.',
+    others: {
+      0: 'Spreading redness suggests infection.',
+      1: 'Hypotension with tachycardia indicates shock.',
+      3: 'Purulent drainage indicates infection.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient asks why the nurse keeps having them turn, cough, and use the spirometer. What is the best response?',
+    options: [
+      '"It\'s the standard hospital policy for all post-op patients."',
+      '"It helps prevent pneumonia and atelectasis after surgery."',
+      '"It speeds discharge so you can go home faster."',
+      '"It distracts you from incisional pain at the wound site."'
+    ],
+    answer: 1,
+    concept: 'TCDB Education',
+    rationale: 'Turn, cough, deep breathe, and incentive spirometer use prevent atelectasis and pneumonia after surgery — the most accurate teaching response.',
+    others: {
+      0: 'Citing policy doesn\'t educate the patient.',
+      2: 'Discharge speed is a side effect, not the primary reason.',
+      3: 'These actions don\'t serve as pain distraction.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient on day 1 has a clean dry incision with mild redness around the edges and no drainage. How should the nurse interpret this?',
+    options: [
+      'These are signs of infection — notify the provider',
+      'These are signs of healing within normal limits',
+      'These are signs of impending dehiscence',
+      'These are signs of internal bleeding requiring urgent action'
+    ],
+    answer: 1,
+    concept: 'Normal Healing',
+    rationale: 'A clean dry incision with mild local redness on day 1 is normal early healing. Worry signs are spreading redness, warmth, swelling, increasing pain, and purulent drainage.',
+    others: {
+      0: 'Mild local redness is expected; spreading redness suggests infection.',
+      2: 'Dehiscence presents with wound separation, not just edge redness.',
+      3: 'Internal bleeding presents with shock signs, not local edge redness.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient has small amounts of pink-tinged thin drainage from the wound on day 2. How should the nurse classify this drainage?',
+    options: [
+      'Serous drainage',
+      'Purulent drainage',
+      'Sanguineous drainage',
+      'Serosanguineous drainage'
+    ],
+    answer: 3,
+    concept: 'Drainage Classification',
+    rationale: 'Pink-tinged thin drainage is serosanguineous — a normal finding during healing. It mixes serous fluid and small amounts of blood.',
+    others: {
+      0: 'Serous drainage is clear and watery.',
+      1: 'Purulent drainage is thick, yellow/green, and foul-smelling.',
+      2: 'Sanguineous drainage is bright red, frank bleeding.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient has the following findings. Which should the nurse address FIRST?',
+    options: [
+      'O₂ sat 88% on room air with shallow respirations',
+      'Mild itching at the IV site',
+      'Pain rated 5/10 at the incision',
+      'Clear urine output of 60 mL in the last hour'
+    ],
+    answer: 0,
+    concept: 'Hypoxia Priority',
+    rationale: 'O₂ sat 88% with shallow respirations indicates hypoxia and possible atelectasis or pneumonia — airway and breathing always come first.',
+    others: {
+      1: 'IV site itching is mild and not urgent.',
+      2: 'Pain 5/10 is manageable; not the priority over hypoxia.',
+      3: 'Urine output of 60 mL/hr is adequate.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient has BP 92/58, HR 118, urine output 15 mL in the last hour, and pallor. The nurse assesses all IV lines and flushes them. What additional priority intervention is appropriate?',
+    options: [
+      'Decrease IV fluid rate to prevent overload',
+      'Apply warming blankets to raise body temperature',
+      'Administer additional IV fluids as ordered',
+      'Place patient in Trendelenburg for an extended period'
+    ],
+    answer: 2,
+    concept: 'IV Fluid Resuscitation',
+    rationale: 'Hypovolemic shock is prevented and treated by IV fluid administration. After confirming patent IV lines, give additional fluids as ordered.',
+    others: {
+      0: 'Decreasing fluids worsens hypovolemia.',
+      1: 'Warming does not address volume loss.',
+      3: 'Trendelenburg can compromise breathing and is not a sustained position.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A nurse is assigning post-op care tasks. Which task is appropriate to delegate to assistive personnel (UAP)?',
+    options: [
+      'Initial assessment of a new evisceration',
+      'Teaching the patient about incentive spirometer use',
+      'Ambulating a stable post-op patient on day 2',
+      'Evaluating wound drainage characteristics'
+    ],
+    answer: 2,
+    concept: 'Delegation',
+    rationale: 'Ambulating a stable post-op patient is appropriate to delegate to UAP. Assessment, teaching, and evaluation of complications require nursing judgment.',
+    others: {
+      0: 'Evisceration assessment requires the RN.',
+      1: 'Teaching is an RN responsibility.',
+      3: 'Drainage evaluation requires nursing judgment.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient develops sudden severe abdominal pain and reports feeling like "something gave way." Which assessment finding would confirm dehiscence?',
+    options: [
+      'Increased bowel sounds and flatus',
+      'Visible separation of the wound layers',
+      'Mild redness at the incision edges',
+      'Pink-tinged serosanguineous drainage'
+    ],
+    answer: 1,
+    concept: 'Dehiscence Assessment',
+    rationale: 'Dehiscence is partial or total separation of wound layers. The "something gave way" sensation followed by visible separation is classic.',
+    others: {
+      0: 'Bowel sounds and flatus indicate returning GI function, not dehiscence.',
+      2: 'Mild edge redness is normal early healing.',
+      3: 'Serosanguineous drainage is normal healing.'
+    }
+  }
+];
+
+// === QUIZ ENGINE ===
+let currentQ = 0;
+let totalPts = 0;
+let answers = [];
+let selectedOption = null;
+
+function begin() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  selectedOption = null;
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+  document.getElementById('progress').style.width = `${(currentQ / questions.length) * 100}%`;
+  document.getElementById('q-stem').textContent = q.stem;
+  const optsHtml = q.options.map((opt, i) => `
+    <div class="option" data-idx="${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${String.fromCharCode(65+i)}.</span>
+      <span>${opt}</span>
+    </div>
+  `).join('');
+  document.getElementById('q-options').innerHTML = optsHtml;
+  document.getElementById('rationale-area').classList.add('hidden');
+  document.getElementById('rationale-area').innerHTML = '';
+  document.getElementById('submit-btn').classList.remove('hidden');
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('next-btn').classList.add('hidden');
+}
+
+function selectOption(idx) {
+  selectedOption = idx;
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.option[data-idx="${idx}"]`).classList.add('selected');
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+  const q = questions[currentQ];
+  const correct = q.answer;
+  const isCorrect = selectedOption === correct;
+  const pts = isCorrect ? 1 : 0;
+  totalPts += pts;
+  answers.push({ q, selected: selectedOption, correct, pts });
+
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.add('locked');
+    el.onclick = null;
+    if (i === correct) el.classList.add('correct');
+    else if (i === selectedOption) el.classList.add('wrong');
+  });
+
+  let othersHtml = '';
+  if (q.others) {
+    othersHtml = '<div class="others-list">';
+    Object.keys(q.others).forEach(k => {
+      othersHtml += `<div><strong>${String.fromCharCode(65+parseInt(k))}.</strong> ${q.others[k]}</div>`;
+    });
+    othersHtml += '</div>';
+  }
+
+  const ratHtml = `
+    <div class="rationale">
+      <span class="concept-pill">${q.concept}</span>
+      <div><strong>${isCorrect ? 'Correct.' : 'Incorrect.'}</strong> ${q.rationale}</div>
+      ${q.deepExplanation ? `<div style="margin-top:8px; color: var(--ink-soft);">${q.deepExplanation}</div>` : ''}
+      ${othersHtml}
+    </div>
+  `;
+  const rArea = document.getElementById('rationale-area');
+  rArea.innerHTML = ratHtml;
+  rArea.classList.remove('hidden');
+  document.getElementById('submit-btn').classList.add('hidden');
+  document.getElementById('next-btn').classList.remove('hidden');
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  const pct = (totalPts / questions.length) * 100;
+  const scoreEl = document.getElementById('r-score');
+  scoreEl.textContent = `${pct.toFixed(0)}%`;
+  if (pct >= 85) scoreEl.classList.add('pass');
+  else if (pct >= 70) scoreEl.classList.add('borderline');
+  else scoreEl.classList.add('fail');
+  document.getElementById('r-pts').textContent = `${totalPts.toFixed(1)} / ${questions.length} points`;
+
+  let msg = '';
+  if (pct >= 90) msg = 'Excellent — you handle priority decisions well.';
+  else if (pct >= 77) msg = 'Passing — review missed scenarios for the test.';
+  else if (pct >= 60) msg = 'Below passing — focus on priority and safety judgments.';
+  else msg = 'This chapter needs deeper review. Re-read scenarios and retake.';
+  document.getElementById('r-msg').textContent = msg;
+
+  const missed = answers.filter(a => a.pts < 1);
+  if (missed.length > 0) {
+    let html = '<h3>Missed Concepts</h3>';
+    missed.forEach(m => {
+      html += `<div class="missed-item">
+        <div class="stem">${m.q.stem}</div>
+        <div class="ans">Correct: ${String.fromCharCode(65+m.correct)}. ${m.q.options[m.correct]}</div>
+        <div class="rat">${m.q.rationale}</div>
+      </div>`;
+    });
+    document.getElementById('missed-section').innerHTML = html;
+  }
+
+  const result = {
+    pct: parseFloat(pct.toFixed(1)),
+    pts: parseFloat(totalPts.toFixed(1)),
+    total: questions.length,
+    date: new Date().toISOString().split('T')[0]
+  };
+  localStorage.setItem('score_postoperative_deepdrill', JSON.stringify(result));
+}
+</script>
+</body>
+</html>

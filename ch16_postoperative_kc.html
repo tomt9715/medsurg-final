@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch 16 Postoperative — Knowledge Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a2540; --navy-soft: #1a3a5c;
+  --teal: #0d9488; --teal-pale: #f0fdfa;
+  --purple: #7c3aed; --purple-pale: #f5f3ff;
+  --gold: #f59e0b; --ink: #1a1a1a; --ink-soft: #3a3a3a; --muted: #6b7280;
+  --bg: #fafaf7; --card: #ffffff; --line: #e5e0d5;
+  --correct: #059669; --correct-bg: #ecfdf5;
+  --wrong: #dc2626; --wrong-bg: #fef2f2;
+  --partial: #d97706; --partial-bg: #fffbeb;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; padding: 32px 16px 80px; min-height: 100vh; }
+.container { max-width: 760px; margin: 0 auto; }
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--teal); text-transform: uppercase; margin-bottom: 12px; }
+h1 { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--navy); margin-bottom: 8px; line-height: 1.15; }
+.tagline { color: var(--muted); margin-bottom: 32px; font-size: 16px; }
+.start-card, .question-card, .results-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 32px; margin-bottom: 24px; }
+.start-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+.start-stat { border: 1px solid var(--line); border-radius: 4px; padding: 16px; text-align: center; }
+.start-stat-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--teal); display: block; }
+.start-stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+.btn { background: var(--teal); color: white; border: none; padding: 14px 32px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.btn:hover { background: #0b7a70; }
+.btn:disabled { background: var(--muted); cursor: not-allowed; }
+.btn-secondary { background: var(--navy); }
+.btn-secondary:hover { background: var(--navy-soft); }
+.progress-bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 24px; }
+.progress-fill { height: 100%; background: var(--teal); transition: width 0.3s; }
+.q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+.q-stem { font-size: 18px; color: var(--ink); margin-bottom: 24px; line-height: 1.5; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.option { border: 1.5px solid var(--line); border-radius: 6px; padding: 14px 18px; cursor: pointer; transition: all 0.15s; background: var(--card); font-size: 15px; display: flex; align-items: flex-start; gap: 12px; }
+.option:hover:not(.locked) { border-color: var(--teal); background: var(--teal-pale); }
+.option.selected { border-color: var(--teal); background: var(--teal-pale); }
+.option.correct { border-color: var(--correct); background: var(--correct-bg); }
+.option.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+.option-letter { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--muted); min-width: 18px; }
+.option.correct .option-letter { color: var(--correct); }
+.option.wrong .option-letter { color: var(--wrong); }
+.rationale { background: var(--teal-pale); border-left: 3px solid var(--teal); padding: 16px 20px; border-radius: 0 6px 6px 0; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+.rationale strong { color: var(--navy); }
+.concept-pill { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.5px; background: var(--teal); color: white; padding: 3px 10px; border-radius: 100px; margin-bottom: 10px; text-transform: uppercase; }
+.others-list { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--ink-soft); }
+.others-list div { margin-bottom: 6px; }
+.btn-row { display: flex; gap: 12px; justify-content: flex-end; }
+.results-score { font-family: 'DM Serif Display', serif; font-size: 56px; text-align: center; margin: 12px 0; }
+.results-score.pass { color: var(--correct); }
+.results-score.borderline { color: var(--partial); }
+.results-score.fail { color: var(--wrong); }
+.results-pts { font-family: 'DM Mono', monospace; text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.perf-msg { text-align: center; margin: 16px 0 32px; font-size: 16px; color: var(--ink-soft); font-style: italic; }
+.missed-section h3 { font-family: 'DM Serif Display', serif; color: var(--navy); margin-bottom: 16px; font-size: 22px; }
+.missed-item { border: 1px solid var(--line); border-radius: 6px; padding: 16px; margin-bottom: 12px; background: var(--bg); font-size: 14px; }
+.missed-item .stem { font-weight: 500; margin-bottom: 8px; }
+.missed-item .ans { color: var(--correct); margin-bottom: 8px; font-family: 'DM Mono', monospace; font-size: 13px; }
+.missed-item .rat { color: var(--ink-soft); font-size: 13px; }
+.back-btn { position: fixed; bottom: 20px; left: 20px; background: var(--navy); color: white; text-decoration: none; padding: 10px 18px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 50; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-btn">← STUDY HUB</a>
+<div class="container">
+
+<div id="start-screen">
+  <div class="eyebrow">Knowledge Check · Chapter 16</div>
+  <h1>Postoperative Nursing Care</h1>
+  <p class="tagline">Direct recall: respiratory/CV/GI/urinary complications, wound care, dehiscence and evisceration management.</p>
+  <div class="start-card">
+    <div class="start-stats">
+      <div class="start-stat"><span class="start-stat-num">25</span><span class="start-stat-label">Questions</span></div>
+      <div class="start-stat"><span class="start-stat-num">MC</span><span class="start-stat-label">Format</span></div>
+      <div class="start-stat"><span class="start-stat-num">Yes</span><span class="start-stat-label">Rationale</span></div>
+    </div>
+    <p style="margin-bottom: 20px; color: var(--ink-soft);">Each question is direct recall from your review guides. Answer, get instant rationale, move on.</p>
+    <button class="btn" onclick="begin()">Begin</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="hidden">
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="question-card">
+    <div class="q-header">
+      <span id="q-counter">Question 1 of 25</span>
+      <span id="q-points">0 pts</span>
+    </div>
+    <div class="q-stem" id="q-stem"></div>
+    <div class="options" id="q-options"></div>
+    <div id="rationale-area" class="hidden"></div>
+    <div class="btn-row">
+      <button class="btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+      <button class="btn btn-secondary hidden" id="next-btn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div id="results-screen" class="hidden">
+  <div class="results-card">
+    <div class="eyebrow">Results · Knowledge Check</div>
+    <h1>Postoperative</h1>
+    <div class="results-score" id="r-score">0%</div>
+    <div class="results-pts" id="r-pts">0 / 25 points</div>
+    <div class="perf-msg" id="r-msg"></div>
+    <div class="btn-row" style="justify-content: center; margin-bottom: 32px;">
+      <button class="btn" onclick="location.reload()">Retry Quiz</button>
+      <a href="index.html" class="btn btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center;">Back to Hub</a>
+    </div>
+    <div class="missed-section" id="missed-section"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'What are common post-operative respiratory complications the nurse must monitor for?',
+    options: [
+      'Atelectasis, pneumonia, and hypoxia',
+      'Pulmonary fibrosis and chronic bronchitis',
+      'Sleep apnea and laryngospasm',
+      'Asthma exacerbation and emphysema'
+    ],
+    answer: 0,
+    concept: 'Respiratory Complications',
+    rationale: 'Common post-op respiratory complications include atelectasis (collapsed lung), pneumonia, and hypoxia.',
+    others: {
+      1: 'These are chronic conditions, not acute post-op complications.',
+      2: 'Sleep apnea is pre-existing; laryngospasm is intraoperative.',
+      3: 'These are chronic conditions, not standard post-op complications.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'How often should a post-op patient perform deep breathing and incentive spirometer use to prevent atelectasis?',
+    options: [
+      'Once per day',
+      'Every 4 hours',
+      'Every 2 hours',
+      'Only if oxygen saturation drops below 90%'
+    ],
+    answer: 2,
+    concept: 'Deep Breathing Frequency',
+    rationale: 'Every 2 hours of deep breathing exercises, coughing, and incentive spirometer use prevents atelectasis and pneumonia.',
+    others: {
+      0: 'Once per day is insufficient frequency to prevent atelectasis.',
+      1: 'Every 4 hours leaves too much time for collapse.',
+      3: 'Waiting for hypoxia is reactive, not preventive.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which interventions help prevent post-op respiratory complications?',
+    options: [
+      'Bedrest and fluid restriction',
+      'Sedation and limited movement',
+      'High-flow oxygen and intubation',
+      'Deep breathing, coughing, and spirometer use'
+    ],
+    answer: 3,
+    concept: 'Pulmonary Toileting',
+    rationale: 'Deep breathing, coughing, and incentive spirometer use are the prevention strategies for post-op respiratory complications.',
+    others: {
+      0: 'Bedrest worsens atelectasis; fluid restriction is not preventive.',
+      1: 'Sedation suppresses respiratory drive.',
+      2: 'These are reactive treatments, not preventive measures.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which are common post-op cardiovascular complications?',
+    options: [
+      'Aortic stenosis and valve regurgitation',
+      'Hypertensive emergency and rebound HTN',
+      'Atrial fibrillation and ventricular tachycardia only',
+      'Hypotension, hemorrhage, hypovolemic shock, DVT/PE'
+    ],
+    answer: 3,
+    concept: 'CV Complications',
+    rationale: 'Common post-op cardiovascular complications include hypotension, hemorrhage, hypovolemic shock, and DVT/PE.',
+    others: {
+      0: 'Valvular disorders are chronic conditions, not post-op complications.',
+      1: 'HTN crisis is uncommon as a post-op complication.',
+      2: 'Dysrhythmias can occur but are not the primary CV complications.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'How is hypovolemic shock prevented post-operatively?',
+    options: [
+      'Restrict oral fluids',
+      'Administer IV fluids and assess all IV lines',
+      'Limit ambulation to bedrest only',
+      'Apply continuous cardiac monitoring'
+    ],
+    answer: 1,
+    concept: 'Shock Prevention',
+    rationale: 'Hypovolemic shock is prevented by IV fluid administration and assessing all IV lines (including flushing with saline).',
+    others: {
+      0: 'Fluid restriction worsens hypovolemia.',
+      2: 'Bedrest alone does not prevent shock.',
+      3: 'Cardiac monitoring detects but does not prevent shock.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which findings are signs of post-op hemorrhage or shock?',
+    options: [
+      'Pallor, cool clammy skin, decreased BP, increased HR',
+      'Flushed face, warm skin, increased BP',
+      'Polyuria, increased appetite, weight gain',
+      'Bradycardia, hypertension, hyperthermia'
+    ],
+    answer: 0,
+    concept: 'Shock Signs',
+    rationale: 'Signs of hemorrhage/shock include pallor, cool/clammy skin, decreased BP, increased HR, and dark concentrated urine.',
+    others: {
+      1: 'Flushed warm skin is the OPPOSITE of shock findings.',
+      2: 'Shock causes oliguria (dark concentrated urine), not polyuria.',
+      3: 'Shock causes tachycardia and hypotension, not bradycardia/HTN.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which interventions help prevent post-op DVT/PE?',
+    options: [
+      'Strict bedrest for 48 hours after surgery',
+      'Early ambulation, leg exercises, anti-embolism stockings, SCDs',
+      'Restricting fluids to minimize venous pressure',
+      'Massage of calf muscles every 4 hours'
+    ],
+    answer: 1,
+    concept: 'DVT/PE Prevention',
+    rationale: 'DVT/PE prevention includes early ambulation, leg exercises, anti-embolism stockings, and sequential compression devices (SCDs).',
+    others: {
+      0: 'Bedrest INCREASES DVT risk by causing venous stasis.',
+      2: 'Fluid restriction can cause hemoconcentration and clotting.',
+      3: 'Calf massage can dislodge an existing clot — never massage suspected DVT.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which urine finding is associated with post-op shock?',
+    options: [
+      'Clear, pale yellow urine',
+      'Bright red, frank blood in urine',
+      'Dark, concentrated urine',
+      'Cloudy white urine with sediment'
+    ],
+    answer: 2,
+    concept: 'Shock Urine',
+    rationale: 'Dark, concentrated urine is a sign of post-op shock — the kidneys are conserving fluid due to hypoperfusion.',
+    others: {
+      0: 'Clear pale yellow urine indicates good perfusion and hydration.',
+      1: 'Frank hematuria suggests urinary tract injury, not generalized shock.',
+      3: 'Cloudy urine with sediment suggests UTI, not shock.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which are common post-op GI complications?',
+    options: [
+      'Paralytic ileus and constipation',
+      'Crohn\'s disease and ulcerative colitis',
+      'Cholecystitis and pancreatitis',
+      'GERD and gastritis'
+    ],
+    answer: 0,
+    concept: 'GI Complications',
+    rationale: 'Common post-op GI complications include paralytic ileus, constipation, and absent bowel sounds (normal early in post-op).',
+    others: {
+      1: 'These are chronic inflammatory bowel diseases.',
+      2: 'These are conditions, not standard post-op complications.',
+      3: 'These are chronic GI conditions.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'What is the priority intervention for post-op constipation?',
+    options: [
+      'Administer enemas every 4 hours',
+      'Insert a nasogastric tube for decompression',
+      'Early ambulation, hydration, and stool softeners',
+      'Restrict fluids to prevent diarrhea'
+    ],
+    answer: 2,
+    concept: 'Constipation Priority',
+    rationale: 'Early ambulation is the priority intervention for post-op constipation, along with hydration and stool softeners.',
+    others: {
+      0: 'Enemas are not first-line; conservative measures are tried first.',
+      1: 'NG tubes are for ileus or obstruction, not simple constipation.',
+      3: 'Hydration is needed; fluid restriction worsens constipation.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'A post-op patient has absent bowel sounds 4 hours after surgery. How should the nurse interpret this?',
+    options: [
+      'This indicates paralytic ileus and requires immediate intervention',
+      'This is a normal finding early in the post-op period',
+      'This indicates bowel obstruction and requires NG tube placement',
+      'This indicates intestinal perforation and requires emergency surgery'
+    ],
+    answer: 1,
+    concept: 'Absent Bowel Sounds',
+    rationale: 'Absent bowel sounds are normal early in the post-op period due to anesthesia effects on GI motility.',
+    others: {
+      0: 'Ileus develops after 24-48 hours, not within 4 hours.',
+      2: 'Obstruction has additional findings beyond just absent sounds early on.',
+      3: 'Perforation presents with severe pain and rigid abdomen, not just absent sounds.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which are common post-op urinary complications?',
+    options: [
+      'Hydronephrosis and renal calculi',
+      'Glomerulonephritis and nephrotic syndrome',
+      'Urinary retention and UTI',
+      'Bladder cancer and prostatitis'
+    ],
+    answer: 2,
+    concept: 'Urinary Complications',
+    rationale: 'Common post-op urinary complications are urinary retention and UTI, often related to anesthesia, immobility, and catheter use.',
+    others: {
+      0: 'These are chronic urinary conditions, not post-op complications.',
+      1: 'These are chronic kidney diseases.',
+      3: 'These are chronic urinary conditions.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'When should a post-op urinary catheter (Foley) be removed to reduce UTI risk?',
+    options: [
+      'Within 24 hours post-op',
+      'After the patient has fully ambulated',
+      'After 7 days of catheterization',
+      'Only when discharge is being planned'
+    ],
+    answer: 0,
+    concept: 'Foley Removal Timing',
+    rationale: 'The Foley catheter should be removed within 24 hours post-op to reduce the risk of CAUTI (catheter-associated UTI).',
+    others: {
+      1: 'Removal timing is based on hours, not ambulation status.',
+      2: '7 days far exceeds the safe window for catheter use.',
+      3: 'Discharge is too late — UTI risk increases with each day.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'How long should a post-op patient be allowed to go without voiding before nursing intervention is needed?',
+    options: [
+      '2 hours',
+      '4 hours',
+      '12 to 24 hours',
+      '6 to 8 hours'
+    ],
+    answer: 3,
+    concept: 'Voiding Timeline',
+    rationale: 'If the patient has not voided in 6-8 hours post-op, intervention is needed. Monitor I&O closely.',
+    others: {
+      0: 'Too short — most patients have not regained voiding ability that quickly.',
+      1: 'Earlier than the standard 6-8 hour threshold.',
+      2: 'Far too long; bladder distension and retention complications develop.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which non-invasive interventions help a post-op patient void before catheterization?',
+    options: [
+      'Administer IV diuretics to force urine production rapidly',
+      'Restrict fluids to prevent further bladder distension',
+      'Place the patient in supine position with legs flat',
+      'Run warm water in the sink and use a bladder scanner'
+    ],
+    answer: 3,
+    concept: 'Voiding Promotion',
+    rationale: 'Run warm water in the sink to stimulate voiding and use a bladder scanner to check volume before performing a straight catheterization.',
+    others: {
+      0: 'Diuretics worsen retention without addressing the underlying issue.',
+      1: 'Fluid restriction does not promote voiding.',
+      2: 'Supine position does not promote voiding; upright is preferred.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Why is timely post-op pain medication administration important?',
+    options: [
+      'To prevent psychological dependence on pain meds',
+      'So the patient can tolerate breathing exercises and physical therapy',
+      'To suppress respiratory drive and slow recovery',
+      'To minimize the need for nursing assessment'
+    ],
+    answer: 1,
+    concept: 'Pain Med Purpose',
+    rationale: 'Administer pain medication promptly so the patient can tolerate breathing exercises and physical therapy. Uncontrolled pain limits mobility and pulmonary toileting.',
+    others: {
+      0: 'Acute post-op pain management does not cause psychological dependence.',
+      2: 'Suppressing respiratory drive is a side effect to monitor, not a goal.',
+      3: 'Pain meds do not eliminate need for nursing assessment.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which finding indicates a wound infection at the surgical site?',
+    options: [
+      'Slight redness around staples on day 1',
+      'Mild serous drainage on day 2',
+      'Spreading redness, warmth, swelling, and purulent drainage',
+      'Decreased swelling and resolving bruising on day 5'
+    ],
+    answer: 2,
+    concept: 'Wound Infection Signs',
+    rationale: 'Local signs of wound infection include spreading redness, warmth (erythema), swelling, increasing pain, purulent drainage (thick yellow/green foul-smelling), and wound edges separating.',
+    others: {
+      0: 'Slight initial redness is normal early healing.',
+      1: 'Serous drainage early on is expected.',
+      3: 'Decreasing swelling and bruising indicate normal healing.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which describes purulent wound drainage?',
+    options: [
+      'Clear, watery, thin fluid with no odor',
+      'Pink-tinged thin fluid mixed with serous',
+      'Bright red frank bleeding from the incision',
+      'Thick, yellow or green, foul-smelling fluid'
+    ],
+    answer: 3,
+    concept: 'Purulent Drainage',
+    rationale: 'Purulent drainage is thick, yellow or green, and foul-smelling. It is a hallmark of wound infection.',
+    others: {
+      0: 'Clear watery fluid is serous drainage (normal early healing).',
+      1: 'Pink-tinged thin fluid is serosanguineous drainage.',
+      2: 'Bright red bleeding is sanguineous drainage.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'What is dehiscence?',
+    options: [
+      'Partial or total separation of wound layers',
+      'Protrusion of internal viscera through the incision',
+      'A collection of blood under the skin',
+      'A localized infection at the wound margins'
+    ],
+    answer: 0,
+    concept: 'Dehiscence Definition',
+    rationale: 'Dehiscence is partial or total separation of wound layers without protrusion of organs.',
+    others: {
+      1: 'That is the definition of evisceration.',
+      2: 'That is a hematoma.',
+      3: 'That describes wound infection or cellulitis.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'How can dehiscence be prevented during coughing?',
+    options: [
+      'Avoid coughing entirely until wound heals',
+      'Hold breath while coughing to reduce pressure',
+      'Splint the incision with a pillow when coughing',
+      'Cough only while lying flat in bed'
+    ],
+    answer: 2,
+    concept: 'Splinting Technique',
+    rationale: 'Splint the incision with a pillow when coughing to prevent dehiscence. This supports the wound and reduces strain on the surgical site.',
+    others: {
+      0: 'Coughing is needed to clear secretions; splinting allows safe coughing.',
+      1: 'Holding breath does not protect the wound.',
+      3: 'Lying flat does not prevent dehiscence.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'What is evisceration?',
+    options: [
+      'A collection of blood under the skin',
+      'Protrusion of internal viscera through the incision site',
+      'Partial separation of wound layers without organ involvement',
+      'Spreading redness and erythema around the wound'
+    ],
+    answer: 1,
+    concept: 'Evisceration Definition',
+    rationale: 'Evisceration is the protrusion of internal viscera (organs) through the incision site. This is a surgical emergency.',
+    others: {
+      0: 'That is a hematoma.',
+      2: 'That is dehiscence (without organs visible).',
+      3: 'That describes wound infection.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'When evisceration occurs, what is the priority nursing action?',
+    options: [
+      'Reinsert the protruding organs gently with sterile gloves',
+      'Apply pressure with a dry sterile gauze',
+      'Cover the area with sterile saline-moistened dressing',
+      'Position the patient prone to reduce visibility of the wound'
+    ],
+    answer: 2,
+    concept: 'Evisceration Action',
+    rationale: 'Cover with sterile saline-moistened dressing. Do NOT reinsert organs.',
+    others: {
+      0: 'NEVER reinsert protruding organs — this can cause severe injury.',
+      1: 'Dry gauze can adhere to and damage exposed organs.',
+      3: 'Prone position does not address the emergency.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'In what position should a patient with evisceration be placed?',
+    options: [
+      'Prone with head turned to the side',
+      'High-Fowler\'s with legs straight',
+      'Trendelenburg position with feet elevated',
+      'Low-Fowler\'s with knees bent'
+    ],
+    answer: 3,
+    concept: 'Evisceration Position',
+    rationale: 'Position in low-Fowler\'s with knees bent. This relaxes abdominal muscles and reduces tension on the wound site.',
+    others: {
+      0: 'Prone position is not appropriate.',
+      1: 'High-Fowler\'s with straight legs increases abdominal tension.',
+      2: 'Trendelenburg can cause organs to slide further out.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'What dietary status is appropriate for a patient with evisceration?',
+    options: [
+      'NPO (nothing by mouth)',
+      'Clear liquid diet',
+      'Regular diet as tolerated',
+      'High-protein diet to promote healing'
+    ],
+    answer: 0,
+    concept: 'Evisceration NPO',
+    rationale: 'A patient with evisceration must be kept NPO. Surgery is needed and oral intake is contraindicated. Notify the provider immediately.',
+    others: {
+      1: 'Even clear liquids are contraindicated — patient needs surgery.',
+      2: 'Regular diet is contraindicated.',
+      3: 'No oral intake before urgent surgery.'
+    }
+  },
+  {
+    topic: 'Postoperative',
+    type: 'standard',
+    stem: 'Which complications can occur at a surgical wound site?',
+    options: [
+      'Tachycardia and hypotension only as systemic findings',
+      'Atelectasis and pneumonia at the operative site',
+      'DVT and pulmonary embolism near the suture line',
+      'Infection, hematoma, dehiscence, evisceration'
+    ],
+    answer: 3,
+    concept: 'Wound Complications',
+    rationale: 'Wound site complications include infection, hematoma, dehiscence, and evisceration.',
+    others: {
+      0: 'These are systemic CV findings, not wound site complications.',
+      1: 'These are respiratory complications.',
+      2: 'These are vascular complications, not wound-specific.'
+    }
+  }
+];
+
+// === QUIZ ENGINE ===
+let currentQ = 0;
+let totalPts = 0;
+let answers = [];
+let selectedOption = null;
+
+function begin() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  selectedOption = null;
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+  document.getElementById('progress').style.width = `${(currentQ / questions.length) * 100}%`;
+  document.getElementById('q-stem').textContent = q.stem;
+  const optsHtml = q.options.map((opt, i) => `
+    <div class="option" data-idx="${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${String.fromCharCode(65+i)}.</span>
+      <span>${opt}</span>
+    </div>
+  `).join('');
+  document.getElementById('q-options').innerHTML = optsHtml;
+  document.getElementById('rationale-area').classList.add('hidden');
+  document.getElementById('rationale-area').innerHTML = '';
+  document.getElementById('submit-btn').classList.remove('hidden');
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('next-btn').classList.add('hidden');
+}
+
+function selectOption(idx) {
+  selectedOption = idx;
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.option[data-idx="${idx}"]`).classList.add('selected');
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+  const q = questions[currentQ];
+  const correct = q.answer;
+  const isCorrect = selectedOption === correct;
+  const pts = isCorrect ? 1 : 0;
+  totalPts += pts;
+  answers.push({ q, selected: selectedOption, correct, pts });
+
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.add('locked');
+    el.onclick = null;
+    if (i === correct) el.classList.add('correct');
+    else if (i === selectedOption) el.classList.add('wrong');
+  });
+
+  let othersHtml = '';
+  if (q.others) {
+    othersHtml = '<div class="others-list">';
+    Object.keys(q.others).forEach(k => {
+      othersHtml += `<div><strong>${String.fromCharCode(65+parseInt(k))}.</strong> ${q.others[k]}</div>`;
+    });
+    othersHtml += '</div>';
+  }
+
+  const ratHtml = `
+    <div class="rationale">
+      <span class="concept-pill">${q.concept}</span>
+      <div><strong>${isCorrect ? 'Correct.' : 'Incorrect.'}</strong> ${q.rationale}</div>
+      ${q.deepExplanation ? `<div style="margin-top:8px; color: var(--ink-soft);">${q.deepExplanation}</div>` : ''}
+      ${othersHtml}
+    </div>
+  `;
+  const rArea = document.getElementById('rationale-area');
+  rArea.innerHTML = ratHtml;
+  rArea.classList.remove('hidden');
+  document.getElementById('submit-btn').classList.add('hidden');
+  document.getElementById('next-btn').classList.remove('hidden');
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  const pct = (totalPts / questions.length) * 100;
+  const scoreEl = document.getElementById('r-score');
+  scoreEl.textContent = `${pct.toFixed(0)}%`;
+  if (pct >= 85) scoreEl.classList.add('pass');
+  else if (pct >= 70) scoreEl.classList.add('borderline');
+  else scoreEl.classList.add('fail');
+  document.getElementById('r-pts').textContent = `${totalPts.toFixed(1)} / ${questions.length} points`;
+
+  let msg = '';
+  if (pct >= 90) msg = 'Excellent recall — you know this chapter cold.';
+  else if (pct >= 77) msg = 'Passing — keep reviewing the missed concepts.';
+  else if (pct >= 60) msg = 'Below passing — focus on the missed concepts before the exam.';
+  else msg = 'This chapter needs more review. Re-read the source guide and retake.';
+  document.getElementById('r-msg').textContent = msg;
+
+  const missed = answers.filter(a => a.pts < 1);
+  if (missed.length > 0) {
+    let html = '<h3>Missed Concepts</h3>';
+    missed.forEach(m => {
+      html += `<div class="missed-item">
+        <div class="stem">${m.q.stem}</div>
+        <div class="ans">Correct: ${String.fromCharCode(65+m.correct)}. ${m.q.options[m.correct]}</div>
+        <div class="rat">${m.q.rationale}</div>
+      </div>`;
+    });
+    document.getElementById('missed-section').innerHTML = html;
+  }
+
+  const result = {
+    pct: parseFloat(pct.toFixed(1)),
+    pts: parseFloat(totalPts.toFixed(1)),
+    total: questions.length,
+    date: new Date().toISOString().split('T')[0]
+  };
+  localStorage.setItem('score_postoperative_knowledge', JSON.stringify(result));
+}
+</script>
+</body>
+</html>

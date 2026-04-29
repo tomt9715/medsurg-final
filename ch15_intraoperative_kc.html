@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch 15 Intraoperative — Knowledge Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a2540;
+  --navy-soft: #1a3a5c;
+  --teal: #0d9488;
+  --teal-soft: #14b8a6;
+  --teal-pale: #f0fdfa;
+  --purple: #7c3aed;
+  --purple-pale: #f5f3ff;
+  --gold: #f59e0b;
+  --ink: #1a1a1a;
+  --ink-soft: #3a3a3a;
+  --muted: #6b7280;
+  --bg: #fafaf7;
+  --card: #ffffff;
+  --line: #e5e0d5;
+  --correct: #059669;
+  --correct-bg: #ecfdf5;
+  --wrong: #dc2626;
+  --wrong-bg: #fef2f2;
+  --partial: #d97706;
+  --partial-bg: #fffbeb;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; padding: 32px 16px 80px; min-height: 100vh; }
+.container { max-width: 760px; margin: 0 auto; }
+.eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1.5px; color: var(--teal); text-transform: uppercase; margin-bottom: 12px; }
+h1 { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--navy); margin-bottom: 8px; line-height: 1.15; }
+.tagline { color: var(--muted); margin-bottom: 32px; font-size: 16px; }
+.start-card, .question-card, .results-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 32px; margin-bottom: 24px; }
+.start-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+.start-stat { border: 1px solid var(--line); border-radius: 4px; padding: 16px; text-align: center; }
+.start-stat-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--teal); display: block; }
+.start-stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+.btn { background: var(--teal); color: white; border: none; padding: 14px 32px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 600; border-radius: 4px; cursor: pointer; transition: background 0.15s; }
+.btn:hover { background: #0b7a70; }
+.btn:disabled { background: var(--muted); cursor: not-allowed; }
+.btn-secondary { background: var(--navy); }
+.btn-secondary:hover { background: var(--navy-soft); }
+.progress-bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 24px; }
+.progress-fill { height: 100%; background: var(--teal); transition: width 0.3s; }
+.q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); }
+.q-stem { font-size: 18px; color: var(--ink); margin-bottom: 24px; line-height: 1.5; }
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.option { border: 1.5px solid var(--line); border-radius: 6px; padding: 14px 18px; cursor: pointer; transition: all 0.15s; background: var(--card); font-size: 15px; display: flex; align-items: flex-start; gap: 12px; }
+.option:hover:not(.locked) { border-color: var(--teal); background: var(--teal-pale); }
+.option.selected { border-color: var(--teal); background: var(--teal-pale); }
+.option.correct { border-color: var(--correct); background: var(--correct-bg); }
+.option.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+.option-letter { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--muted); min-width: 18px; }
+.option.correct .option-letter { color: var(--correct); }
+.option.wrong .option-letter { color: var(--wrong); }
+.rationale { background: var(--teal-pale); border-left: 3px solid var(--teal); padding: 16px 20px; border-radius: 0 6px 6px 0; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+.rationale strong { color: var(--navy); }
+.concept-pill { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.5px; background: var(--teal); color: white; padding: 3px 10px; border-radius: 100px; margin-bottom: 10px; text-transform: uppercase; }
+.others-list { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 13px; color: var(--ink-soft); }
+.others-list div { margin-bottom: 6px; }
+.btn-row { display: flex; gap: 12px; justify-content: flex-end; }
+.results-score { font-family: 'DM Serif Display', serif; font-size: 56px; text-align: center; margin: 12px 0; }
+.results-score.pass { color: var(--correct); }
+.results-score.borderline { color: var(--partial); }
+.results-score.fail { color: var(--wrong); }
+.results-pts { font-family: 'DM Mono', monospace; text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+.perf-msg { text-align: center; margin: 16px 0 32px; font-size: 16px; color: var(--ink-soft); font-style: italic; }
+.missed-section h3 { font-family: 'DM Serif Display', serif; color: var(--navy); margin-bottom: 16px; font-size: 22px; }
+.missed-item { border: 1px solid var(--line); border-radius: 6px; padding: 16px; margin-bottom: 12px; background: var(--bg); font-size: 14px; }
+.missed-item .stem { font-weight: 500; margin-bottom: 8px; }
+.missed-item .ans { color: var(--correct); margin-bottom: 8px; font-family: 'DM Mono', monospace; font-size: 13px; }
+.missed-item .rat { color: var(--ink-soft); font-size: 13px; }
+.back-btn { position: fixed; bottom: 20px; left: 20px; background: var(--navy); color: white; text-decoration: none; padding: 10px 18px; border-radius: 100px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 50; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-btn">← STUDY HUB</a>
+<div class="container">
+
+<div id="start-screen">
+  <div class="eyebrow">Knowledge Check · Chapter 15</div>
+  <h1>Intraoperative Nursing</h1>
+  <p class="tagline">Direct recall: OR roles, surgical zones, infection prevention, malignant hyperthermia.</p>
+  <div class="start-card">
+    <div class="start-stats">
+      <div class="start-stat"><span class="start-stat-num">25</span><span class="start-stat-label">Questions</span></div>
+      <div class="start-stat"><span class="start-stat-num">MC</span><span class="start-stat-label">Format</span></div>
+      <div class="start-stat"><span class="start-stat-num">Yes</span><span class="start-stat-label">Rationale</span></div>
+    </div>
+    <p style="margin-bottom: 20px; color: var(--ink-soft);">Each question is direct recall from your review guides. Answer, get instant rationale, move on.</p>
+    <button class="btn" onclick="begin()">Begin</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="hidden">
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="question-card">
+    <div class="q-header">
+      <span id="q-counter">Question 1 of 25</span>
+      <span id="q-points">0 pts</span>
+    </div>
+    <div class="q-stem" id="q-stem"></div>
+    <div class="options" id="q-options"></div>
+    <div id="rationale-area" class="hidden"></div>
+    <div class="btn-row">
+      <button class="btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+      <button class="btn btn-secondary hidden" id="next-btn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div id="results-screen" class="hidden">
+  <div class="results-card">
+    <div class="eyebrow">Results · Knowledge Check</div>
+    <h1>Intraoperative</h1>
+    <div class="results-score" id="r-score">0%</div>
+    <div class="results-pts" id="r-pts">0 / 25 points</div>
+    <div class="perf-msg" id="r-msg"></div>
+    <div class="btn-row" style="justify-content: center; margin-bottom: 32px;">
+      <button class="btn" onclick="location.reload()">Retry Quiz</button>
+      <a href="index.html" class="btn btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center;">Back to Hub</a>
+    </div>
+    <div class="missed-section" id="missed-section"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'When does the intraoperative period begin?',
+    options: [
+      'When the patient signs the surgical consent form',
+      'When the surgeon makes the first incision',
+      'When anesthesia is induced',
+      'When the patient is transferred onto the OR bed'
+    ],
+    answer: 3,
+    concept: 'Intraop Start',
+    rationale: 'The intraoperative period begins when the patient is transferred onto the operating room (OR) bed.',
+    others: {
+      0: 'Consent signing is part of the preoperative phase.',
+      1: 'Incision occurs after intraoperative care has already begun.',
+      2: 'Anesthesia induction occurs after the patient is on the OR bed.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'When does the intraoperative period end?',
+    options: [
+      'When the surgeon closes the incision',
+      'When the patient is admitted to the PACU',
+      'When the patient awakens from anesthesia',
+      'When the patient returns to the surgical floor'
+    ],
+    answer: 1,
+    concept: 'Intraop End',
+    rationale: 'The intraoperative period concludes when the patient is admitted to the Postanesthesia Care Unit (PACU).',
+    others: {
+      0: 'Closing the incision still occurs during the intraoperative phase.',
+      2: 'Awakening occurs in the PACU during the postoperative phase.',
+      3: 'Returning to the floor is well into the postoperative phase.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'What are the primary intraoperative goals?',
+    options: [
+      'Patient safety, infection prevention, dignity, homeostasis',
+      'Minimize cost, reduce surgery time, and bill efficiently',
+      'Document the procedure thoroughly and complete billing codes',
+      'Coordinate post-op rehabilitation services and discharge planning'
+    ],
+    answer: 0,
+    concept: 'Primary Goals',
+    rationale: 'Primary intraoperative goals include patient safety, infection prevention, preserving dignity, and maintaining homeostasis (oxygenation, circulation, temperature).',
+    others: {
+      1: 'Cost and time are not primary intraoperative goals.',
+      2: 'Documentation is supportive but not the primary clinical goal.',
+      3: 'Rehab coordination is a postoperative concern.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which role best describes the scrub nurse?',
+    options: [
+      'Functions in the non-sterile field and manages documentation',
+      'Provides anesthesia and monitors hemodynamics',
+      'Functions within the sterile field, providing instruments to the surgeon',
+      'Counsels the family in the surgical waiting area'
+    ],
+    answer: 2,
+    concept: 'Scrub Nurse Role',
+    rationale: 'The scrub nurse functions within the sterile field, assisting the surgeon by providing required instruments and maintaining sterile integrity.',
+    others: {
+      0: 'That describes the circulating nurse.',
+      1: 'That is the role of the anesthesiologist or CRNA.',
+      3: 'Family communication is typically not the scrub nurse\'s role.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which of the following is a responsibility of the circulating nurse?',
+    options: [
+      'Conducting instrument counts and managing documentation',
+      'Handing instruments to the surgeon during the procedure',
+      'Inducing general anesthesia for the patient',
+      'Performing the surgical incision under supervision'
+    ],
+    answer: 0,
+    concept: 'Circulating Nurse Role',
+    rationale: 'The circulating nurse operates in the non-sterile field; responsibilities include securing supplies, conducting instrument counts, and managing comprehensive documentation.',
+    others: {
+      1: 'That describes the scrub nurse role.',
+      2: 'Anesthesia induction is performed by the anesthesia provider.',
+      3: 'Only the surgeon performs the incision.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which attire is required for the unrestricted zone of the surgical area?',
+    options: [
+      'Scrubs, caps, masks, and shoe covers',
+      'Scrubs and caps only',
+      'Sterile gown and gloves',
+      'Street clothes are allowed'
+    ],
+    answer: 3,
+    concept: 'Unrestricted Zone',
+    rationale: 'In the unrestricted zone, street clothes are allowed. This is the outermost zone of the surgical environment.',
+    others: {
+      0: 'That is the restricted zone attire.',
+      1: 'That is the semi-restricted zone attire.',
+      2: 'Sterile gown and gloves are for the sterile field, not for zone entry.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which attire is required for the semi-restricted zone?',
+    options: [
+      'Scrub clothes and caps',
+      'Street clothes only',
+      'Scrubs, caps, masks, and shoe covers',
+      'Sterile gowns and surgical gloves'
+    ],
+    answer: 0,
+    concept: 'Semi-Restricted Zone',
+    rationale: 'Semi-restricted zone requires scrub clothes and caps.',
+    others: {
+      1: 'Street clothes are only permitted in the unrestricted zone.',
+      2: 'That is restricted zone attire.',
+      3: 'Sterile garb is for the sterile field within the restricted zone.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which attire is required for the restricted zone?',
+    options: [
+      'Street clothes are permitted',
+      'Scrubs and caps only',
+      'Sterile gown and gloves only',
+      'Scrubs, caps, masks, and shoe covers'
+    ],
+    answer: 3,
+    concept: 'Restricted Zone',
+    rationale: 'The restricted zone requires scrubs, caps, masks, and shoe covers. Strict surgical asepsis is maintained.',
+    others: {
+      0: 'Street clothes are only allowed in the unrestricted zone.',
+      1: 'That is the semi-restricted zone attire.',
+      2: 'Sterile garb is added at the sterile field, but baseline restricted attire includes mask and shoe covers.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'What is the primary intervention for preventing surgical site infection?',
+    options: [
+      'Increasing room temperature to ≥75°F',
+      'Limiting OR door openings during the procedure',
+      'Preparing the skin according to hospital protocol',
+      'Administering IV fluids before incision'
+    ],
+    answer: 2,
+    concept: 'Skin Prep',
+    rationale: 'Preparing the skin according to hospital protocol is a primary intervention to prevent infection.',
+    others: {
+      0: 'High room temperatures encourage bacterial growth.',
+      1: 'Limiting traffic helps but is not the primary intervention.',
+      3: 'IV fluids support hemodynamics, not infection prevention directly.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'When should preoperative bathing occur?',
+    options: [
+      'Two weeks before surgery',
+      'The night before the planned surgery',
+      'Immediately after the surgery',
+      'Only if the patient develops a wound infection'
+    ],
+    answer: 1,
+    concept: 'Preop Bath Timing',
+    rationale: 'Preoperative bathing should consist of a full-body wash using an antimicrobial soap the night before the planned surgery.',
+    others: {
+      0: 'Too early — protective effect is lost.',
+      2: 'Post-op bathing does not prevent the surgical infection.',
+      3: 'Bathing is preventive, not reactive.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which antimicrobial agent is commonly used for additional preoperative skin cleansing?',
+    options: [
+      'Hydrogen peroxide',
+      'Rubbing alcohol pads',
+      'Chlorhexidine wipes',
+      'Sterile saline solution'
+    ],
+    answer: 2,
+    concept: 'Chlorhexidine Wipes',
+    rationale: 'Additional body cleansing with chlorhexidine wipes may also occur in the preoperative area by the nurse or by the patient under the nurse\'s direction.',
+    others: {
+      0: 'Hydrogen peroxide is not the standard preoperative antimicrobial.',
+      1: 'Alcohol pads are not the standard preoperative skin prep.',
+      3: 'Saline does not have antimicrobial properties.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'What type of disorder is malignant hyperthermia?',
+    options: [
+      'An infectious disease transmitted between patients',
+      'A psychiatric condition triggered by anxiety',
+      'An autoimmune disorder triggered by surgical stress',
+      'An inherited muscle disorder triggered by anesthetic agents'
+    ],
+    answer: 3,
+    concept: 'MH Pathophysiology',
+    rationale: 'Malignant hyperthermia is a rare, inherited muscle disorder that is chemically induced by anesthetic agents.',
+    others: {
+      0: 'MH is not infectious.',
+      1: 'MH is a physiologic, not psychiatric, condition.',
+      2: 'MH is genetic, not autoimmune.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'What is the underlying pathophysiology of malignant hyperthermia?',
+    options: [
+      'Hypermetabolic altered calcium function in skeletal muscle',
+      'Massive vasodilation throughout the systemic circulation',
+      'Bone marrow suppression of all stem cell production lines',
+      'Failure of the kidneys to regulate fluid and electrolyte balance'
+    ],
+    answer: 0,
+    concept: 'MH Mechanism',
+    rationale: 'MH is a hypermetabolic condition involving altered calcium function mechanisms within skeletal muscle cells.',
+    others: {
+      1: 'Vasodilation is not the central mechanism.',
+      2: 'Bone marrow suppression is unrelated.',
+      3: 'Renal regulation is not the underlying mechanism.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'When do symptoms of malignant hyperthermia typically appear after anesthesia induction?',
+    options: [
+      'Immediately upon induction',
+      '2 to 3 hours after induction',
+      '10 to 20 minutes after induction',
+      '24 hours after surgery is completed'
+    ],
+    answer: 2,
+    concept: 'MH Onset',
+    rationale: 'Symptoms typically manifest about 10 to 20 minutes after the induction of anesthesia.',
+    others: {
+      0: 'Onset is not immediate; it occurs minutes after induction.',
+      1: 'Far too late — the typical window is 10-20 minutes.',
+      3: 'MH is an intraoperative emergency, not a delayed reaction.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which finding is an EARLY sign of malignant hyperthermia?',
+    options: [
+      'Profound bradycardia and hypotension',
+      'Rapid rise in body temperature',
+      'Tachycardia, jaw rigidity, and increased CO₂',
+      'Pinpoint pupils and respiratory depression'
+    ],
+    answer: 2,
+    concept: 'MH Early Signs',
+    rationale: 'Early signs of MH include tachycardia (HR >150 bpm), generalized muscle rigidity (jaw tightness), and hypercapnia (increased CO₂).',
+    others: {
+      0: 'MH causes tachycardia, not bradycardia.',
+      1: 'Rapid temperature rise is a LATE sign of MH.',
+      3: 'These are signs of opioid overdose, not MH.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which finding is a LATE sign of malignant hyperthermia?',
+    options: [
+      'Tachycardia greater than 150 bpm',
+      'Jaw bone tightening',
+      'Increased end-tidal carbon dioxide',
+      'Rapid increase in body temperature'
+    ],
+    answer: 3,
+    concept: 'MH Late Sign',
+    rationale: 'A rapid rise in body temperature is the late sign of malignant hyperthermia. By the time temperature spikes, MH is already advanced.',
+    others: {
+      0: 'Tachycardia is an early sign.',
+      1: 'Jaw rigidity is an early sign.',
+      2: 'Increased CO₂ is an early sign.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'What is the priority first action when malignant hyperthermia is recognized?',
+    options: [
+      'Apply cooling blankets to the patient',
+      'Communicate to the surgical team immediately',
+      'Administer IV potassium replacement',
+      'Insert a urinary catheter for output monitoring'
+    ],
+    answer: 1,
+    concept: 'MH Priority Action',
+    rationale: 'Priority first action is to communicate to the surgical team. Prompt recognition is imperative — anesthetic agents must be discontinued immediately and surgery postponed.',
+    others: {
+      0: 'Cooling is part of treatment but not the FIRST action.',
+      2: 'Potassium replacement is not the immediate first step.',
+      3: 'Catheter insertion is supportive, not the priority.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'What is the primary medication used to treat malignant hyperthermia?',
+    options: [
+      'IV dantrolene',
+      'IV epinephrine',
+      'IV morphine',
+      'IV atropine'
+    ],
+    answer: 0,
+    concept: 'MH Drug',
+    rationale: 'The primary medical intervention is administering IV dantrolene, which acts as a muscle relaxant.',
+    others: {
+      1: 'Epinephrine treats anaphylaxis, not MH.',
+      2: 'Morphine is an analgesic, not a treatment for MH.',
+      3: 'Atropine is for bradycardia, not MH.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which intervention is part of MH treatment in addition to dantrolene?',
+    options: [
+      'Warming blankets and IV calcium gluconate',
+      'Oxygen, cooling, and correction of acidosis',
+      'Continued anesthesia at a lower dose',
+      'Beta-blocker therapy and bed rest'
+    ],
+    answer: 1,
+    concept: 'MH Supportive Care',
+    rationale: 'MH treatment includes oxygen, cooling, and correction of acidosis along with stopping anesthesia and giving IV dantrolene.',
+    others: {
+      0: 'Warming is the OPPOSITE of what is needed; calcium worsens MH.',
+      2: 'Anesthesia must be STOPPED, not continued.',
+      3: 'Beta-blockers are not the standard intervention.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'What specific equipment must be readily available in the OR for malignant hyperthermia?',
+    options: [
+      'A defibrillator only',
+      'A code cart with epinephrine',
+      'An MH-specific cart',
+      'A blood transfusion warmer'
+    ],
+    answer: 2,
+    concept: 'MH Cart',
+    rationale: 'An MH-specific cart must be available in the OR. It contains dantrolene and other supplies needed to treat MH rapidly.',
+    others: {
+      0: 'A defibrillator is for cardiac arrest, not MH-specific.',
+      1: 'A standard code cart does not contain dantrolene.',
+      3: 'A blood warmer is unrelated to MH.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'When MH is recognized, what must happen to the surgery?',
+    options: [
+      'It should be completed quickly and the patient transferred to ICU',
+      'It must be postponed and anesthetic agents discontinued',
+      'It should continue with reduced anesthesia',
+      'It can proceed if dantrolene is administered'
+    ],
+    answer: 1,
+    concept: 'MH Surgery Decision',
+    rationale: 'Anesthetic agents must be discontinued immediately, and the surgery should be postponed to focus on resuscitation.',
+    others: {
+      0: 'Rushing to complete the surgery worsens the patient\'s status.',
+      2: 'Anesthesia must be STOPPED entirely.',
+      3: 'Dantrolene treats MH but does not allow continuing surgery.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'In addition to giving dantrolene, what additional treatment goals exist for MH?',
+    options: [
+      'Decreasing metabolism, reversing acidosis, correcting dysrhythmias, decreasing body temp',
+      'Increasing metabolism, raising temperature, and inducing hyperventilation',
+      'Maintaining current anesthesia and increasing IV fluids',
+      'Restricting fluids and applying warming blankets'
+    ],
+    answer: 0,
+    concept: 'MH Treatment Goals',
+    rationale: 'Additional treatment goals include decreasing metabolism, reversing metabolic and respiratory acidosis, correcting dysrhythmias and electrolyte imbalances, and rapidly decreasing body temperature.',
+    others: {
+      1: 'These actions worsen MH.',
+      2: 'Anesthesia must be stopped, not maintained.',
+      3: 'Fluid restriction and warming worsen MH.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'A scrub nurse is preparing for a procedure. Where does this nurse function?',
+    options: [
+      'In the unrestricted hallway documenting supplies',
+      'In the family waiting area providing updates',
+      'In the PACU receiving the patient post-op',
+      'Inside the sterile field assisting the surgeon'
+    ],
+    answer: 3,
+    concept: 'Scrub Nurse Location',
+    rationale: 'The scrub nurse functions within the sterile field, assisting the surgeon by providing required instruments.',
+    others: {
+      0: 'That is the circulating nurse area.',
+      1: 'Family communication is typically not the scrub nurse role.',
+      2: 'PACU is the postoperative phase, not intraoperative.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'Which heart rate finding is consistent with early malignant hyperthermia?',
+    options: [
+      'HR less than 60 bpm',
+      'HR around 80 bpm',
+      'HR around 100 bpm',
+      'HR greater than 150 bpm'
+    ],
+    answer: 3,
+    concept: 'MH Heart Rate',
+    rationale: 'Early signs of MH include tachycardia greater than 150 bpm.',
+    others: {
+      0: 'Bradycardia is not a feature of MH.',
+      1: 'Normal heart rate is not consistent with MH.',
+      2: 'Mild tachycardia does not meet the MH criterion of >150 bpm.'
+    }
+  },
+  {
+    topic: 'Intraoperative',
+    type: 'standard',
+    stem: 'What level of asepsis is maintained in the operating room?',
+    options: [
+      'Medical asepsis only',
+      'Strict surgical asepsis',
+      'No asepsis required if patient is stable',
+      'Standard precautions only'
+    ],
+    answer: 1,
+    concept: 'Surgical Asepsis',
+    rationale: 'Strict surgical asepsis is a priority in the OR. The surgical area is divided into zones to control the environment.',
+    others: {
+      0: 'Medical asepsis (clean technique) is insufficient for the OR.',
+      2: 'Asepsis is always required in the OR.',
+      3: 'Standard precautions are baseline; the OR requires strict surgical asepsis.'
+    }
+  }
+];
+
+// === QUIZ ENGINE ===
+let currentQ = 0;
+let totalPts = 0;
+let answers = [];
+let selectedOption = null;
+
+function begin() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  selectedOption = null;
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+  document.getElementById('progress').style.width = `${(currentQ / questions.length) * 100}%`;
+  document.getElementById('q-stem').textContent = q.stem;
+  const optsHtml = q.options.map((opt, i) => `
+    <div class="option" data-idx="${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${String.fromCharCode(65+i)}.</span>
+      <span>${opt}</span>
+    </div>
+  `).join('');
+  document.getElementById('q-options').innerHTML = optsHtml;
+  document.getElementById('rationale-area').classList.add('hidden');
+  document.getElementById('rationale-area').innerHTML = '';
+  document.getElementById('submit-btn').classList.remove('hidden');
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('next-btn').classList.add('hidden');
+}
+
+function selectOption(idx) {
+  selectedOption = idx;
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.option[data-idx="${idx}"]`).classList.add('selected');
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+  const q = questions[currentQ];
+  const correct = q.answer;
+  const isCorrect = selectedOption === correct;
+  const pts = isCorrect ? 1 : 0;
+  totalPts += pts;
+  answers.push({ q, selected: selectedOption, correct, pts });
+
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.add('locked');
+    el.onclick = null;
+    if (i === correct) el.classList.add('correct');
+    else if (i === selectedOption) el.classList.add('wrong');
+  });
+
+  let othersHtml = '';
+  if (q.others) {
+    othersHtml = '<div class="others-list">';
+    Object.keys(q.others).forEach(k => {
+      othersHtml += `<div><strong>${String.fromCharCode(65+parseInt(k))}.</strong> ${q.others[k]}</div>`;
+    });
+    othersHtml += '</div>';
+  }
+
+  const ratHtml = `
+    <div class="rationale">
+      <span class="concept-pill">${q.concept}</span>
+      <div><strong>${isCorrect ? 'Correct.' : 'Incorrect.'}</strong> ${q.rationale}</div>
+      ${q.deepExplanation ? `<div style="margin-top:8px; color: var(--ink-soft);">${q.deepExplanation}</div>` : ''}
+      ${othersHtml}
+    </div>
+  `;
+  const rArea = document.getElementById('rationale-area');
+  rArea.innerHTML = ratHtml;
+  rArea.classList.remove('hidden');
+  document.getElementById('submit-btn').classList.add('hidden');
+  document.getElementById('next-btn').classList.remove('hidden');
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  const pct = (totalPts / questions.length) * 100;
+  const scoreEl = document.getElementById('r-score');
+  scoreEl.textContent = `${pct.toFixed(0)}%`;
+  if (pct >= 85) scoreEl.classList.add('pass');
+  else if (pct >= 70) scoreEl.classList.add('borderline');
+  else scoreEl.classList.add('fail');
+  document.getElementById('r-pts').textContent = `${totalPts.toFixed(1)} / ${questions.length} points`;
+
+  let msg = '';
+  if (pct >= 90) msg = 'Excellent recall — you know this chapter cold.';
+  else if (pct >= 77) msg = 'Passing — keep reviewing the missed concepts.';
+  else if (pct >= 60) msg = 'Below passing — focus on the missed concepts before the exam.';
+  else msg = 'This chapter needs more review. Re-read the source guide and retake.';
+  document.getElementById('r-msg').textContent = msg;
+
+  const missed = answers.filter(a => a.pts < 1);
+  if (missed.length > 0) {
+    let html = '<h3>Missed Concepts</h3>';
+    missed.forEach(m => {
+      html += `<div class="missed-item">
+        <div class="stem">${m.q.stem}</div>
+        <div class="ans">Correct: ${String.fromCharCode(65+m.correct)}. ${m.q.options[m.correct]}</div>
+        <div class="rat">${m.q.rationale}</div>
+      </div>`;
+    });
+    document.getElementById('missed-section').innerHTML = html;
+  }
+
+  const result = {
+    pct: parseFloat(pct.toFixed(1)),
+    pts: parseFloat(totalPts.toFixed(1)),
+    total: questions.length,
+    date: new Date().toISOString().split('T')[0]
+  };
+  localStorage.setItem('score_intraoperative_knowledge', JSON.stringify(result));
+}
+</script>
+</body>
+</html>

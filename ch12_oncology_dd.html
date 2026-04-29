@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch 12 Oncology — Deep Drill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Serif+Display&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a2540;
+  --navy-soft: #1a3a5c;
+  --teal: #0d9488;
+  --teal-soft: #14b8a6;
+  --teal-pale: #f0fdfa;
+  --purple: #7c3aed;
+  --purple-soft: #8b5cf6;
+  --purple-pale: #f5f3ff;
+  --gold: #f59e0b;
+  --ink: #1a1a1a;
+  --ink-soft: #3a3a3a;
+  --muted: #6b7280;
+  --bg: #fafaf7;
+  --card: #ffffff;
+  --line: #e5e0d5;
+  --correct: #059669;
+  --correct-bg: #ecfdf5;
+  --wrong: #dc2626;
+  --wrong-bg: #fef2f2;
+  --partial: #d97706;
+  --partial-bg: #fffbeb;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  padding: 32px 16px 80px;
+  min-height: 100vh;
+}
+.container { max-width: 760px; margin: 0 auto; }
+.eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--purple);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 36px;
+  color: var(--navy);
+  margin-bottom: 8px;
+  line-height: 1.15;
+}
+.tagline { color: var(--muted); margin-bottom: 32px; font-size: 16px; }
+.start-card, .question-card, .results-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 32px;
+  margin-bottom: 24px;
+}
+.start-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 24px 0;
+}
+.start-stat {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+}
+.start-stat-num {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  color: var(--purple);
+  display: block;
+}
+.start-stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.btn {
+  background: var(--purple);
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn:hover { background: #6d28d9; }
+.btn:disabled { background: var(--muted); cursor: not-allowed; }
+.btn-secondary { background: var(--navy); }
+.btn-secondary:hover { background: var(--navy-soft); }
+.progress-bar {
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--purple);
+  transition: width 0.3s;
+}
+.q-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+.q-stem {
+  font-size: 18px;
+  color: var(--ink);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.option {
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  padding: 14px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--card);
+  font-size: 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.option:hover:not(.locked) { border-color: var(--purple); background: var(--purple-pale); }
+.option.selected { border-color: var(--purple); background: var(--purple-pale); }
+.option.correct { border-color: var(--correct); background: var(--correct-bg); }
+.option.wrong { border-color: var(--wrong); background: var(--wrong-bg); }
+.option-letter {
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+  color: var(--muted);
+  min-width: 18px;
+}
+.option.correct .option-letter { color: var(--correct); }
+.option.wrong .option-letter { color: var(--wrong); }
+.rationale {
+  background: var(--purple-pale);
+  border-left: 3px solid var(--purple);
+  padding: 16px 20px;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.rationale strong { color: var(--navy); }
+.concept-pill {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  background: var(--purple);
+  color: white;
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+.others-list {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.others-list div { margin-bottom: 6px; }
+.btn-row { display: flex; gap: 12px; justify-content: flex-end; }
+.results-score {
+  font-family: 'DM Serif Display', serif;
+  font-size: 56px;
+  text-align: center;
+  margin: 12px 0;
+}
+.results-score.pass { color: var(--correct); }
+.results-score.borderline { color: var(--partial); }
+.results-score.fail { color: var(--wrong); }
+.results-pts {
+  font-family: 'DM Mono', monospace;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+.perf-msg {
+  text-align: center;
+  margin: 16px 0 32px;
+  font-size: 16px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+.missed-section h3 {
+  font-family: 'DM Serif Display', serif;
+  color: var(--navy);
+  margin-bottom: 16px;
+  font-size: 22px;
+}
+.missed-item {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: var(--bg);
+  font-size: 14px;
+}
+.missed-item .stem { font-weight: 500; margin-bottom: 8px; }
+.missed-item .ans { color: var(--correct); margin-bottom: 8px; font-family: 'DM Mono', monospace; font-size: 13px; }
+.missed-item .rat { color: var(--ink-soft); font-size: 13px; }
+.back-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: var(--navy);
+  color: white;
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 100px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 50;
+}
+.hidden { display: none; }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-btn">← STUDY HUB</a>
+<div class="container">
+
+<div id="start-screen">
+  <div class="eyebrow">Deep Drill · Chapter 12</div>
+  <h1>Oncology Nursing Management</h1>
+  <p class="tagline">NCLEX-style application: priority decisions, neutropenic safety calls, radiation isolation judgments, sepsis recognition.</p>
+  <div class="start-card">
+    <div class="start-stats">
+      <div class="start-stat"><span class="start-stat-num">25</span><span class="start-stat-label">Questions</span></div>
+      <div class="start-stat"><span class="start-stat-num">MC</span><span class="start-stat-label">Format</span></div>
+      <div class="start-stat"><span class="start-stat-num">Yes</span><span class="start-stat-label">Rationale</span></div>
+    </div>
+    <p style="margin-bottom: 20px; color: var(--ink-soft);">Higher-difficulty NCLEX-style scenarios. Apply your knowledge to priority and clinical-judgment situations.</p>
+    <button class="btn" onclick="begin()">Begin</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="hidden">
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="question-card">
+    <div class="q-header">
+      <span id="q-counter">Question 1 of 25</span>
+      <span id="q-points">0 pts</span>
+    </div>
+    <div class="q-stem" id="q-stem"></div>
+    <div class="options" id="q-options"></div>
+    <div id="rationale-area" class="hidden"></div>
+    <div class="btn-row">
+      <button class="btn" id="submit-btn" onclick="submitAnswer()" disabled>Submit</button>
+      <button class="btn btn-secondary hidden" id="next-btn" onclick="nextQuestion()">Next</button>
+    </div>
+  </div>
+</div>
+
+<div id="results-screen" class="hidden">
+  <div class="results-card">
+    <div class="eyebrow">Results · Deep Drill</div>
+    <h1>Oncology</h1>
+    <div class="results-score" id="r-score">0%</div>
+    <div class="results-pts" id="r-pts">0 / 25 points</div>
+    <div class="perf-msg" id="r-msg"></div>
+    <div class="btn-row" style="justify-content: center; margin-bottom: 32px;">
+      <button class="btn" onclick="location.reload()">Retry Quiz</button>
+      <a href="index.html" class="btn btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center;">Back to Hub</a>
+    </div>
+    <div class="missed-section" id="missed-section"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A nurse is caring for four chemo patients. Which patient should the nurse assess FIRST?',
+    options: [
+      'A patient reporting mild nausea 6 hours after chemo infusion',
+      'A patient asking about hair loss and scalp care',
+      'A patient with mild fatigue after morning ambulation',
+      'A patient with a temperature of 100.6°F and a productive cough'
+    ],
+    answer: 3,
+    concept: 'Priority Triage',
+    rationale: 'Fever ≥100.4°F with respiratory symptoms in a chemo patient = possible sepsis. Assess first and notify provider — the immune system cannot fight infection alone.',
+    others: {
+      0: 'Mild nausea is expected post-chemo; antiemetic management is appropriate but not most urgent.',
+      1: 'Hair loss is a psychosocial concern but not life-threatening.',
+      2: 'Mild fatigue is expected with chemo-induced anemia.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A neutropenic patient\'s family member arrives with a vase of fresh-cut flowers and a fruit basket. What is the nurse\'s best response?',
+    options: [
+      'Place the flowers in the windowsill and wash the fruit before serving.',
+      'Both items pose infection risk and must remain outside the room.',
+      'Allow the flowers but discard the fruit basket immediately.',
+      'Allow both — the patient needs comfort items during treatment.'
+    ],
+    answer: 1,
+    concept: 'Neutropenic Environment',
+    rationale: 'Fresh flowers, plants, and unwashed fruit can carry pathogens (mold, bacteria) that a neutropenic patient cannot fight. Both must stay out.',
+    others: {
+      0: 'Even washed, fresh fruit and flowers carry environmental pathogens.',
+      2: 'Flowers also carry mold and bacteria — both must be removed.',
+      3: 'Comfort does not override infection prevention in neutropenia.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient has a platelet count of 28,000 (normal 150,000-400,000). Which finding requires immediate nursing intervention?',
+    options: [
+      'Mild fatigue with morning ambulation',
+      'New severe headache with confusion',
+      'Soft-bristle toothbrush at the bedside',
+      'Loss of appetite at lunch'
+    ],
+    answer: 1,
+    concept: 'Bleeding Risk Recognition',
+    rationale: 'Severe headache with confusion in a thrombocytopenic patient suggests possible intracranial bleeding — a medical emergency. Notify the provider immediately.',
+    others: {
+      0: 'Mild fatigue is expected with anemia and not an immediate emergency.',
+      2: 'Soft-bristle toothbrushes are appropriate — this is a correct safety measure.',
+      3: 'Decreased appetite is common with chemo.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A patient receiving brachytherapy for prostate cancer is in a private room with a radiation warning sign. A new graduate nurse asks why she cannot stay in the room to chart. What is the best response?',
+    options: [
+      '"You may stay as long as you wear gloves and a gown."',
+      '"You can stay up to 2 hours per shift if you wear a lead apron."',
+      '"It\'s only a precaution; routine charting in the room is fine."',
+      '"Limit time at the bedside and wear a lead apron during direct contact."'
+    ],
+    answer: 3,
+    concept: 'Radiation Time/Distance',
+    rationale: 'Limit time at the bedside and wear a lead apron during direct patient contact. The principles are time, distance, and shielding to minimize exposure.',
+    others: {
+      0: 'Gloves and gown do not block radiation — a lead apron is required.',
+      1: '2 hours per shift is excessive for unshielded staff exposure.',
+      2: 'Routine charting at bedside violates radiation safety principles.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A patient receiving external beam radiation states, "I want to scrub off these markings before my date this weekend." Which response by the nurse is most appropriate?',
+    options: [
+      '"That\'s fine, the technicians will reapply them next time."',
+      '"Use a gentle exfoliating scrub to fade them gradually."',
+      '"Apply lotion daily to help the markings come off naturally."',
+      '"You must keep the markings — they guide each treatment to the right spot."'
+    ],
+    answer: 3,
+    concept: 'Skin Marking Education',
+    rationale: 'Skin markings must NOT be removed — they ensure radiation is delivered to the precise treatment area. Removing them disrupts treatment accuracy.',
+    others: {
+      0: 'Reapplying delays treatment and risks misalignment.',
+      1: 'Exfoliating scrubs irritate radiated skin AND remove markings.',
+      2: 'Lotion is contraindicated unless prescribed and would also remove markings.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient calls the clinic 3 weeks post-infusion. Which symptom requires the nurse to direct the patient to the emergency department immediately?',
+    options: [
+      'Hair loss noticed when brushing',
+      'Mild constipation for 2 days',
+      'Temperature of 101.2°F lasting 2 hours',
+      'Tingling in fingertips when typing'
+    ],
+    answer: 2,
+    concept: 'Fever Action',
+    rationale: 'Fever ≥100.4°F lasting >1 hour in a chemo patient may indicate neutropenic sepsis. Direct to ED immediately for blood cultures and IV antibiotics.',
+    others: {
+      0: 'Alopecia is expected and does not require ED.',
+      1: 'Mild constipation is common; address with hydration and stool softeners.',
+      3: 'Peripheral neuropathy is a chemo side effect, not an ED emergency.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A nurse is teaching a chemo patient about reporting side effects. Which statement indicates the patient needs more teaching?',
+    options: [
+      '"I\'ll call my doctor if I have a fever over 100.4°F that lasts more than an hour."',
+      '"I should use an electric razor instead of a regular razor."',
+      '"I can take aspirin if I get a headache from the chemo."',
+      '"I need to drink 2 to 3 liters of fluid every day."'
+    ],
+    answer: 2,
+    concept: 'Aspirin Avoidance',
+    rationale: 'Aspirin increases bleeding risk in thrombocytopenic patients and must be avoided. The patient needs more teaching — acetaminophen is preferred.',
+    others: {
+      0: 'Correct — fever ≥100.4°F lasting >1 hour requires reporting.',
+      1: 'Correct — electric razors prevent nicks and bleeding.',
+      3: 'Correct — 2-3 L/day is the recommended hydration goal.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A pregnant nurse is assigned to a patient with a brachytherapy implant. What is the most appropriate action?',
+    options: [
+      'Provide care while wearing two lead aprons.',
+      'Limit time at the bedside to 15 minutes per shift.',
+      'Decline the assignment and request a reassignment.',
+      'Stay 6 feet from the patient while providing care.'
+    ],
+    answer: 2,
+    concept: 'Pregnancy Reassignment',
+    rationale: 'Pregnant nurses must NOT care for brachytherapy patients due to fetal radiation exposure risk. Decline and request reassignment.',
+    others: {
+      0: 'Lead aprons reduce but do not eliminate fetal exposure.',
+      1: 'Any direct exposure during pregnancy is contraindicated.',
+      3: '6 feet of distance does not eliminate radiation risk for a fetus.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient\'s lab results show: WBC 1.8 (normal 4-11), Platelets 110,000 (normal 150K-400K), Hemoglobin 9.2 (normal 12-18 g/dL). Which precaution is the priority?',
+    options: [
+      'Bleeding precautions',
+      'Falls precautions only',
+      'Dietary fluid restriction',
+      'Neutropenic precautions'
+    ],
+    answer: 3,
+    concept: 'Combined Precautions Priority',
+    rationale: 'WBC of 1.8 indicates severe leukopenia — neutropenic precautions are the priority because infection is the leading cause of death in cancer patients.',
+    others: {
+      0: 'Bleeding precautions matter (platelets borderline) but infection is more lethal.',
+      1: 'Falls precautions for anemia are appropriate but not the top priority.',
+      2: 'No indication for fluid restriction; chemo patients need hydration.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A patient with a brachytherapy implant accidentally dislodges it onto the bed. What is the nurse\'s priority action?',
+    options: [
+      'Pick it up with bare hands and return it to the radiation department.',
+      'Use long-handled forceps to place it in a lead container; do not touch it.',
+      'Flush it down the toilet to dispose of safely.',
+      'Wrap it in gauze and place it in a regular trash bag.'
+    ],
+    answer: 1,
+    concept: 'Dislodged Implant',
+    rationale: 'Use long-handled forceps to pick up a dislodged implant and place it in a lead-lined container. Never touch it directly. Notify the radiation safety officer immediately.',
+    others: {
+      0: 'Direct handling exposes the nurse to dangerous radiation doses.',
+      2: 'Flushing contaminates the water system with radioactive material.',
+      3: 'Standard trash disposal is unsafe and illegal.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient with chronic cancer pain is prescribed scheduled around-the-clock opioids. The patient asks, "Why can\'t I just take it when it really hurts?" What is the best nursing response?',
+    options: [
+      '"Around-the-clock dosing keeps blood levels steady and prevents pain from spiking."',
+      '"PRN dosing is fine, but you might get addicted that way."',
+      '"It saves the hospital money to schedule the doses."',
+      '"You\'ll need to wait until insurance approves PRN dosing."'
+    ],
+    answer: 0,
+    concept: 'ATC Pain Rationale',
+    rationale: 'Around-the-clock dosing maintains steady analgesic levels and prevents pain from escalating. PRN dosing leaves gaps and allows pain to spike.',
+    others: {
+      1: 'Addiction in cancer pain is rare; this answer is misleading and not the rationale.',
+      2: 'Cost is not the reason and is unprofessional.',
+      3: 'Insurance is not the reason for ATC dosing.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A neutropenic patient is being discharged home. Which statement by the family indicates correct understanding of home care?',
+    options: [
+      '"We\'ll make sure to bring the dog into bed for emotional support."',
+      '"We can take him to a small family birthday party next week."',
+      '"We\'ll let our grandkids visit after they got the live nasal flu vaccine."',
+      '"We\'ll wash our hands before entering his room."'
+    ],
+    answer: 3,
+    concept: 'Home Neutropenic Education',
+    rationale: 'Hand hygiene before entering the patient\'s room is the cornerstone of home neutropenic care.',
+    others: {
+      0: 'Pets in bed pose infection risk from dander, saliva, and microbes.',
+      1: 'Crowds and gatherings should be avoided in neutropenia.',
+      2: 'Live vaccine recipients shed virus and pose infection risk.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A patient receiving chemotherapy reports new burning during urination. What is the nurse\'s priority action?',
+    options: [
+      'Tell the patient to drink more water and recheck in 24 hours.',
+      'Recommend over-the-counter cranberry supplements.',
+      'Notify the provider — this may indicate UTI in an immunocompromised patient.',
+      'Document the finding and reassess at the next chemo visit.'
+    ],
+    answer: 2,
+    concept: 'New UTI Symptoms',
+    rationale: 'New burning urination in a chemo patient may indicate UTI, which can rapidly progress to urosepsis in an immunocompromised host. Notify the provider promptly.',
+    others: {
+      0: 'Watchful waiting is dangerous in immunosuppression.',
+      1: 'Cranberry supplements do not treat active infection.',
+      3: 'Documentation alone delays urgent treatment.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A patient receiving radiation to the chest reports the skin in the treatment area is red and itchy. Which intervention is appropriate?',
+    options: [
+      'Clean gently with mild soap and water; avoid lotions unless prescribed.',
+      'Apply ice packs for 20 minutes every hour to reduce inflammation.',
+      'Apply hydrocortisone cream from the pharmacy aisle.',
+      'Cover the area with a tight-fitting compression shirt.'
+    ],
+    answer: 0,
+    concept: 'Radiation Skin Reaction',
+    rationale: 'Mild radiation dermatitis is managed by gentle cleansing with mild soap and water. Avoid lotions, powders, or cosmetics unless specifically prescribed.',
+    others: {
+      1: 'Extreme temperatures damage radiated skin.',
+      2: 'OTC creams may interact with radiation and worsen reactions.',
+      3: 'Tight clothing causes friction and worsens skin breakdown.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A nurse is reviewing chemo orders for a patient with a history of heart failure. Which order should the nurse question?',
+    options: [
+      'Schedule pre-chemo cardiac echocardiogram.',
+      'Administer ondansetron 30 minutes before chemo.',
+      'Bolus 2 liters of normal saline rapidly before chemo.',
+      'Monitor temperature every 4 hours after infusion.'
+    ],
+    answer: 2,
+    concept: 'Cardiotoxicity Caution',
+    rationale: 'Rapid 2-liter saline bolus could trigger fluid overload in a heart failure patient — especially since chemo carries cardiotoxicity risk. Question this order.',
+    others: {
+      0: 'Pre-chemo echo is appropriate to establish baseline cardiac function.',
+      1: 'Ondansetron is standard pre-medication for nausea.',
+      3: 'Temperature monitoring is appropriate to detect infection.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient develops sudden flank pain, decreased urine output, and lab results show K+ 5.9 (normal 3.5-5.0), phosphate 6.2 (normal 2.5-4.5), calcium 7.1 (normal 9-10.5). Which complication does the nurse suspect?',
+    options: [
+      'Diabetic ketoacidosis',
+      'Tumor lysis syndrome',
+      'Acute pancreatitis',
+      'Hypovolemic shock'
+    ],
+    answer: 1,
+    concept: 'Tumor Lysis Recognition',
+    rationale: 'Hyperkalemia, hyperphosphatemia, hypocalcemia, and renal symptoms after chemo = classic tumor lysis syndrome. Massive cell breakdown overwhelms the kidneys.',
+    others: {
+      0: 'DKA presents with hyperglycemia and acidosis, not these specific electrolyte patterns.',
+      2: 'Pancreatitis presents with epigastric pain and elevated lipase.',
+      3: 'Shock presents with hypotension and tachycardia, not these labs.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient asks why they are being told to use an electric razor instead of their usual disposable one. What is the best response?',
+    options: [
+      '"Disposable razors can cause cuts that lead to bleeding when platelets are low."',
+      '"Electric razors are more comfortable on dry skin."',
+      '"Electric razors are required by hospital policy for all patients."',
+      '"It\'s a personal preference — either is fine during chemo."'
+    ],
+    answer: 0,
+    concept: 'Razor Teaching',
+    rationale: 'Disposable razors can cause nicks and cuts. With low platelets, even small cuts can cause significant bleeding. Electric razors are safer.',
+    others: {
+      1: 'Comfort is not the clinical reason.',
+      2: 'It is a clinical safety measure, not blanket hospital policy.',
+      3: 'They are NOT equivalent in a thrombocytopenic patient.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A patient with leukemia and an ANC of 300 (normal 1,500-8,000) has the following findings. Which finding requires immediate provider notification?',
+    options: [
+      'Temperature of 100.5°F',
+      'Mild fatigue throughout the day',
+      'Hemoglobin of 10.1 g/dL (normal 12-18)',
+      'Pink mucous membranes'
+    ],
+    answer: 0,
+    concept: 'Severe Neutropenia + Fever',
+    rationale: 'In severe neutropenia (ANC <500), a temperature of 100.4°F or higher is a medical emergency. Notify provider immediately for cultures and empiric antibiotics.',
+    others: {
+      1: 'Fatigue is expected with anemia.',
+      2: 'Hemoglobin 10.1 is mild anemia, not emergent.',
+      3: 'Pink mucous membranes is a normal finding.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient is preparing for discharge. The nurse should reinforce which instruction?',
+    options: [
+      'Avoid crowds and people who recently received live vaccines.',
+      'Eat raw sushi to maintain protein intake.',
+      'Receive the live attenuated nasal influenza vaccine.',
+      'Stop antiemetics once nausea improves to save costs.'
+    ],
+    answer: 0,
+    concept: 'Discharge Education Priority',
+    rationale: 'Avoid crowds AND people recently immunized with live vaccines — they can shed virus and infect an immunocompromised patient.',
+    others: {
+      1: 'Raw foods carry pathogens dangerous to the immunocompromised.',
+      2: 'Live vaccines are contraindicated in chemo patients.',
+      3: 'Antiemetics should be used as prescribed, not stopped prematurely.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient develops oral pain and white plaques on the tongue. Which finding does the nurse suspect, and what is the priority?',
+    options: [
+      'Stomatitis from chemo; encourage warm tea rinses.',
+      'Normal post-chemo finding; no intervention needed.',
+      'Allergic reaction to medications; stop all oral meds.',
+      'Oral candidiasis (thrush); notify provider for antifungal therapy.'
+    ],
+    answer: 3,
+    concept: 'Oral Candidiasis',
+    rationale: 'White plaques on the tongue in an immunocompromised patient suggest oral candidiasis (thrush), an opportunistic infection requiring antifungal treatment.',
+    others: {
+      0: 'Stomatitis presents as ulcers and inflammation, not white plaques.',
+      1: 'Thrush requires intervention to prevent spread and worsening.',
+      2: 'Stopping all oral meds without provider guidance is unsafe.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'Which patient is the nurse\'s priority during shift assessment? (Normal platelets 150K-400K; ANC 1,500-8,000)',
+    options: [
+      'Chemo patient with platelets 80,000 and minor gum bleeding when brushing',
+      'Chemo patient on day 10 post-infusion with an ANC of 200 and a temperature of 100.6°F',
+      'Patient receiving external radiation reporting itchy treated skin',
+      'Brachytherapy patient asking about visitor rules for tomorrow'
+    ],
+    answer: 1,
+    concept: 'Highest Priority Patient',
+    rationale: 'ANC 200 with fever = profound neutropenia plus possible sepsis. Day 10 post-infusion is the typical neutrophil nadir. Highest priority for assessment and intervention.',
+    others: {
+      0: 'Minor bleeding is expected with low platelets but not most urgent.',
+      2: 'Itchy skin is mild and not life-threatening.',
+      3: 'Visitor questions are educational and non-urgent.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient with severe nausea has not eaten in 24 hours. Which intervention should the nurse implement first?',
+    options: [
+      'Force fluids and a regular diet to maintain calorie intake.',
+      'Administer prescribed antiemetic and offer small frequent meals.',
+      'Insert a nasogastric tube for tube feeding.',
+      'Hold all oral intake until nausea fully resolves.'
+    ],
+    answer: 1,
+    concept: 'Antiemetic Priority',
+    rationale: 'Administer the prescribed antiemetic first, then offer small frequent meals. Pre-medication with antiemetics is the cornerstone of managing chemo-induced nausea.',
+    others: {
+      0: 'Forcing food worsens nausea and can trigger vomiting.',
+      2: 'NG tube is invasive and inappropriate before trying antiemetics.',
+      3: 'Prolonged NPO worsens fluid/electrolyte status.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A patient is receiving brachytherapy. The implant is in place, and a visitor asks how long they may stay. What is the nurse\'s best response?',
+    options: [
+      '"Visits are limited to 30 minutes per day during the implant therapy."',
+      '"You can stay as long as you wear a lead apron."',
+      '"There are no visitor restrictions during brachytherapy."',
+      '"Visits should be limited to 2 hours per day at this stage."'
+    ],
+    answer: 0,
+    concept: 'Visitor Limits',
+    rationale: 'Limit visitors to 30 minutes per day during brachytherapy to minimize their radiation exposure. Visitors should also stay 6 feet away when possible.',
+    others: {
+      1: 'Lead aprons are for staff during direct care, not standard visitor wear.',
+      2: 'Brachytherapy requires strict visitor restrictions.',
+      3: '2 hours far exceeds safe daily exposure.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient asks the nurse about ways to prevent infection at home. Which patient teaching point is correct?',
+    options: [
+      'Garden daily with bare hands for stress relief.',
+      'Eat fresh sushi to maintain protein intake.',
+      'Wash hands before eating and after using the restroom.',
+      'Visit grandchildren immediately after their MMR vaccine.'
+    ],
+    answer: 2,
+    concept: 'Hand Hygiene Education',
+    rationale: 'Hand hygiene is the cornerstone of infection prevention. Wash hands before eating and after using the restroom.',
+    others: {
+      0: 'Soil contains fungi and bacteria — gloves are required when gardening.',
+      1: 'Raw fish carries pathogens dangerous to immunocompromised patients.',
+      3: 'Recently MMR-vaccinated individuals can shed virus and pose risk.'
+    }
+  },
+  {
+    topic: 'Oncology',
+    type: 'standard',
+    stem: 'A chemo patient with thrombocytopenia is being discharged. Which instruction should the nurse emphasize?',
+    options: [
+      'Take aspirin daily to prevent blood clots.',
+      'Floss vigorously twice daily to prevent gingivitis.',
+      'Report any black tarry stools, nosebleeds, or unexplained bruising.',
+      'Take ibuprofen for any joint or muscle aches.'
+    ],
+    answer: 2,
+    concept: 'Bleeding Signs Education',
+    rationale: 'Black tarry stools (GI bleeding), nosebleeds, and unexplained bruising can indicate bleeding in a thrombocytopenic patient and must be reported immediately.',
+    others: {
+      0: 'Aspirin increases bleeding risk and is contraindicated.',
+      1: 'Vigorous flossing causes gum bleeding in thrombocytopenia.',
+      3: 'NSAIDs increase bleeding risk and are contraindicated.'
+    }
+  }
+];
+
+// === QUIZ ENGINE ===
+let currentQ = 0;
+let totalPts = 0;
+let answers = [];
+let selectedOption = null;
+
+function begin() {
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  selectedOption = null;
+  document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+  document.getElementById('progress').style.width = `${(currentQ / questions.length) * 100}%`;
+  document.getElementById('q-stem').textContent = q.stem;
+  const optsHtml = q.options.map((opt, i) => `
+    <div class="option" data-idx="${i}" onclick="selectOption(${i})">
+      <span class="option-letter">${String.fromCharCode(65+i)}.</span>
+      <span>${opt}</span>
+    </div>
+  `).join('');
+  document.getElementById('q-options').innerHTML = optsHtml;
+  document.getElementById('rationale-area').classList.add('hidden');
+  document.getElementById('rationale-area').innerHTML = '';
+  document.getElementById('submit-btn').classList.remove('hidden');
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('next-btn').classList.add('hidden');
+}
+
+function selectOption(idx) {
+  selectedOption = idx;
+  document.querySelectorAll('.option').forEach(el => el.classList.remove('selected'));
+  document.querySelector(`.option[data-idx="${idx}"]`).classList.add('selected');
+  document.getElementById('submit-btn').disabled = false;
+}
+
+function submitAnswer() {
+  const q = questions[currentQ];
+  const correct = q.answer;
+  const isCorrect = selectedOption === correct;
+  const pts = isCorrect ? 1 : 0;
+  totalPts += pts;
+  answers.push({ q, selected: selectedOption, correct, pts });
+
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.classList.add('locked');
+    el.onclick = null;
+    if (i === correct) el.classList.add('correct');
+    else if (i === selectedOption) el.classList.add('wrong');
+  });
+
+  let othersHtml = '';
+  if (q.others) {
+    othersHtml = '<div class="others-list">';
+    Object.keys(q.others).forEach(k => {
+      othersHtml += `<div><strong>${String.fromCharCode(65+parseInt(k))}.</strong> ${q.others[k]}</div>`;
+    });
+    othersHtml += '</div>';
+  }
+
+  const ratHtml = `
+    <div class="rationale">
+      <span class="concept-pill">${q.concept}</span>
+      <div><strong>${isCorrect ? 'Correct.' : 'Incorrect.'}</strong> ${q.rationale}</div>
+      ${q.deepExplanation ? `<div style="margin-top:8px; color: var(--ink-soft);">${q.deepExplanation}</div>` : ''}
+      ${othersHtml}
+    </div>
+  `;
+  const rArea = document.getElementById('rationale-area');
+  rArea.innerHTML = ratHtml;
+  rArea.classList.remove('hidden');
+  document.getElementById('submit-btn').classList.add('hidden');
+  document.getElementById('next-btn').classList.remove('hidden');
+  document.getElementById('q-points').textContent = `${totalPts.toFixed(1)} pts`;
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResults();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  const pct = (totalPts / questions.length) * 100;
+  const scoreEl = document.getElementById('r-score');
+  scoreEl.textContent = `${pct.toFixed(0)}%`;
+  if (pct >= 85) scoreEl.classList.add('pass');
+  else if (pct >= 70) scoreEl.classList.add('borderline');
+  else scoreEl.classList.add('fail');
+  document.getElementById('r-pts').textContent = `${totalPts.toFixed(1)} / ${questions.length} points`;
+
+  let msg = '';
+  if (pct >= 90) msg = 'Excellent — you handle priority decisions well.';
+  else if (pct >= 77) msg = 'Passing — review missed scenarios for the test.';
+  else if (pct >= 60) msg = 'Below passing — focus on priority and safety judgments.';
+  else msg = 'This chapter needs deeper review. Re-read scenarios and retake.';
+  document.getElementById('r-msg').textContent = msg;
+
+  const missed = answers.filter(a => a.pts < 1);
+  if (missed.length > 0) {
+    let html = '<h3>Missed Concepts</h3>';
+    missed.forEach(m => {
+      html += `<div class="missed-item">
+        <div class="stem">${m.q.stem}</div>
+        <div class="ans">Correct: ${String.fromCharCode(65+m.correct)}. ${m.q.options[m.correct]}</div>
+        <div class="rat">${m.q.rationale}</div>
+      </div>`;
+    });
+    document.getElementById('missed-section').innerHTML = html;
+  }
+
+  const result = {
+    pct: parseFloat(pct.toFixed(1)),
+    pts: parseFloat(totalPts.toFixed(1)),
+    total: questions.length,
+    date: new Date().toISOString().split('T')[0]
+  };
+  localStorage.setItem('score_oncology_deepdrill', JSON.stringify(result));
+}
+</script>
+</body>
+</html>
